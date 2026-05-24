@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Robot & Synthetic Human Movies Watchlist</title>
+  <style>
+    :root {
+      --bg: #070b14;
+      --panel: rgba(255, 255, 255, 0.075);
+      --panel-strong: rgba(255, 255, 255, 0.12);
+      --text: #f5f7fb;
+      --muted: #aab4c4;
+      --accent: #71f5ff;
+      --accent-2: #b490ff;
+      --danger: #ff6b9a;
+      --success: #7dffb2;
+      --warning: #ffd36e;
+      --radius: 22px;
+      --shadow: 0 22px 70px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(113, 245, 255, 0.22), transparent 32rem),
+        radial-gradient(circle at top right, rgba(180, 144, 255, 0.20), transparent 34rem),
+        linear-gradient(180deg, #070b14 0%, #101827 50%, #070b14 100%);
+      min-height: 100vh;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .page {
+      width: min(1220px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 42px 0 56px;
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.25fr) minmax(280px, 0.75fr);
+      gap: 24px;
+      align-items: stretch;
+      margin-bottom: 28px;
+    }
+
+    .hero-card, .side-card, .toolbar, .movie-card {
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(18px);
+      border-radius: var(--radius);
+    }
+
+    .hero-card {
+      padding: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card::after {
+      content: "";
+      position: absolute;
+      width: 260px;
+      height: 260px;
+      border-radius: 999px;
+      background: rgba(113, 245, 255, 0.16);
+      right: -110px;
+      top: -110px;
+      filter: blur(4px);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(113, 245, 255, 0.12);
+      border: 1px solid rgba(113, 245, 255, 0.28);
+      color: var(--accent);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .creator-credit {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 4px 6px;
+      width: fit-content;
+      margin-bottom: 18px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+      word-spacing: 0.08em;
+    }
+
+    .creator-credit strong {
+      color: var(--text);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 6vw, 72px);
+      line-height: 0.95;
+      letter-spacing: -0.06em;
+      max-width: 760px;
+    }
+
+    .hero p {
+      margin: 18px 0 0;
+      color: var(--muted);
+      font-size: 18px;
+      line-height: 1.6;
+      max-width: 760px;
+    }
+
+    .side-card {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .stat-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+    }
+
+    .stat {
+      background: rgba(255,255,255,0.075);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      padding: 14px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 26px;
+      letter-spacing: -0.04em;
+    }
+
+    .stat span {
+      display: block;
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      padding: 16px;
+      display: grid;
+      grid-template-columns: minmax(220px, 1fr) repeat(2, minmax(160px, 220px));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    input, select {
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.16);
+      background: rgba(0,0,0,0.24);
+      color: var(--text);
+      padding: 13px 14px;
+      border-radius: 14px;
+      outline: none;
+      font: inherit;
+    }
+
+    input::placeholder { color: rgba(255,255,255,0.42); }
+
+    option { color: #101827; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .movie-card {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      transition: transform 180ms ease, border-color 180ms ease, background 180ms ease;
+    }
+
+    .movie-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(113,245,255,0.36);
+      background: var(--panel-strong);
+    }
+
+    .poster-wrap {
+      position: relative;
+      aspect-ratio: 2 / 3;
+      background: linear-gradient(135deg, rgba(113,245,255,0.16), rgba(180,144,255,0.16));
+      overflow: hidden;
+    }
+
+    .poster-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .poster-fallback {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 20px;
+      color: rgba(255,255,255,0.78);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background:
+        radial-gradient(circle at top, rgba(113,245,255,0.22), transparent 50%),
+        linear-gradient(135deg, #172033, #090d16);
+    }
+
+    .poster-wrap img + .poster-fallback { display: none; }
+
+    .rating {
+      position: absolute;
+      right: 12px;
+      top: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.65);
+      border: 1px solid rgba(255,255,255,0.14);
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .content {
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      flex: 1;
+    }
+
+    .movie-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      align-items: start;
+    }
+
+    h2 {
+      font-size: 19px;
+      line-height: 1.15;
+      letter-spacing: -0.03em;
+      margin: 0;
+    }
+
+    .year {
+      color: var(--muted);
+      font-size: 13px;
+      flex: 0 0 auto;
+    }
+
+    .desc {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+      margin: 0;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: auto;
+    }
+
+    .tag {
+      border-radius: 999px;
+      padding: 6px 9px;
+      font-size: 12px;
+      color: rgba(255,255,255,0.86);
+      background: rgba(255,255,255,0.09);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .where {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 12px;
+    }
+
+    .where-title {
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+    }
+
+    .providers {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+    }
+
+    .provider {
+      font-size: 12px;
+      border-radius: 10px;
+      padding: 7px 8px;
+      background: rgba(113,245,255,0.10);
+      color: var(--accent);
+      border: 1px solid rgba(113,245,255,0.18);
+      font-weight: 700;
+    }
+
+    .links {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 38px;
+      padding: 9px 11px;
+      border-radius: 12px;
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.13);
+      color: var(--text);
+      font-weight: 800;
+      font-size: 13px;
+      transition: background 160ms ease, border-color 160ms ease;
+    }
+
+    .btn.primary {
+      background: linear-gradient(135deg, rgba(113,245,255,0.22), rgba(180,144,255,0.24));
+      border-color: rgba(113,245,255,0.28);
+    }
+
+    .btn:hover { background: rgba(255,255,255,0.16); }
+
+    .empty {
+      display: none;
+      text-align: center;
+      padding: 44px;
+      color: var(--muted);
+      background: var(--panel);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: var(--radius);
+    }
+
+    footer {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+      word-spacing: 0.06em;
+    }
+
+    @media (max-width: 1020px) {
+      .hero { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    }
+
+    @media (max-width: 760px) {
+      .page { width: min(100% - 20px, 1220px); padding-top: 20px; }
+      .hero-card { padding: 24px; }
+      .toolbar { grid-template-columns: 1fr; }
+      .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .content { padding: 14px; }
+      h2 { font-size: 16px; }
+      .desc { font-size: 13px; }
+    }
+
+    @media (max-width: 470px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="hero">
+      <div class="hero-card">
+        <div class="eyebrow">🤖 Robot / Android / Synthetic Human Watchlist</div>
+        <div class="creator-credit"><span>Created by</span><strong>Natarajan Murugesan</strong><span>with AI assistance</span></div>
+        <h1>Movies for fans of AI, androids and synthetic humans</h1>
+        <p>
+          A curated sci-fi watchlist based on Blade Runner, Ex Machina, Alien synthetics, emotional robots,
+          and machine-consciousness stories. Use the filters to pick the mood: smart AI, synthetic humans,
+          action robots, family-friendly robots, or dark machine threat.
+        </p>
+      </div>
+      <aside class="side-card">
+        <div class="stat-grid">
+          <div class="stat"><strong id="movieCount">12</strong><span>Movies</span></div>
+          <div class="stat"><strong>NL</strong><span>Watch region</span></div>
+          <div class="stat"><strong>5</strong><span>Theme groups</span></div>
+          <div class="stat"><strong>2026</strong><span>Availability checked</span></div>
+        </div>
+        <div class="note">
+          Streaming availability changes frequently. Provider chips show currently found Netherlands options or best search links.
+          Use the JustWatch / FilmVandaag buttons before renting or subscribing.
+        </div>
+      </aside>
+    </section>
+
+    <section class="toolbar" aria-label="Movie filters">
+      <input id="search" type="search" placeholder="Search movie, theme, provider..." />
+      <select id="theme">
+        <option value="all">All themes</option>
+        <option value="Synthetic Human">Synthetic Human</option>
+        <option value="AI Consciousness">AI Consciousness</option>
+        <option value="Alien Synthetic">Alien Synthetic</option>
+        <option value="Robot Action">Robot Action</option>
+        <option value="Family Robot">Family Robot</option>
+      </select>
+      <select id="sort">
+        <option value="priority">Recommended order</option>
+        <option value="yearDesc">Newest first</option>
+        <option value="yearAsc">Oldest first</option>
+        <option value="title">Title A–Z</option>
+      </select>
+    </section>
+
+    <section class="grid" id="movieGrid"></section>
+    <section class="empty" id="emptyState">No movies matched your filters.</section>
+
+    <footer>
+      <strong>Created by Natarajan Murugesan with AI assistance.</strong><br />
+      Poster thumbnails are loaded from public movie-poster CDN paths where available. If a poster fails to load, the card title fallback remains visible.
+      This page is designed as a practical watchlist, not a permanent streaming database.
+    </footer>
+  </main>
+
+  <script>
+    const movies = [
+      {
+        title: "Ex Machina",
+        year: 2014,
+        rating: "AI",
+        theme: "AI Consciousness",
+        poster: "https://image.tmdb.org/t/p/w500/dmJW8IAKHKxFNiUnoDR7JfsK7Rp.jpg",
+        description: "A programmer evaluates a humanoid AI in a private lab, but the test becomes a psychological game about control, desire and consciousness.",
+        tags: ["Humanoid AI", "Mind games", "Modern classic"],
+        providers: ["SkyShowtime", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/96408-ex-machina/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Ex%20Machina"
+      },
+      {
+        title: "Blade Runner 2049",
+        year: 2017,
+        rating: "Replicant",
+        theme: "Synthetic Human",
+        poster: "https://image.tmdb.org/t/p/w500/gajva2L0rPYkEWjzgFlBXCAVBE5.jpg",
+        description: "A synthetic-human blade runner uncovers a secret that challenges memory, identity, reproduction and what it means to be real.",
+        tags: ["Replicants", "Cyberpunk", "Identity"],
+        providers: ["HBO Max", "Pathé Thuis", "Rent/Buy"],
+        filmVandaag: "https://www.filmvandaag.nl/film/99532-blade-runner-2049/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Blade%20Runner%202049"
+      },
+      {
+        title: "Blade Runner",
+        year: 1982,
+        rating: "Classic",
+        theme: "Synthetic Human",
+        poster: "https://image.tmdb.org/t/p/w500/63N9uy8nd9j7Eog2axPQ8lbr3Wj.jpg",
+        description: "The foundational synthetic-human noir: replicants, implanted memories, corporate control and the fear of artificial life becoming too human.",
+        tags: ["Replicants", "Noir", "Essential"],
+        providers: ["Amazon Prime Video", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/4710-blade-runner/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Blade%20Runner"
+      },
+      {
+        title: "I, Robot",
+        year: 2004,
+        rating: "Robots",
+        theme: "Robot Action",
+        poster: "https://image.tmdb.org/t/p/w500/efwv6F2lGaghjPpBRSINHtoEiZB.jpg",
+        description: "In a near future where robots serve humans, a detective investigates a murder that may expose a dangerous flaw in machine ethics.",
+        tags: ["Robot laws", "Action", "Detective"],
+        providers: ["Disney+", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/22-i-robot/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=I%2C%20Robot"
+      },
+      {
+        title: "A.I. Artificial Intelligence",
+        year: 2001,
+        rating: "Emotional",
+        theme: "AI Consciousness",
+        poster: "https://image.tmdb.org/t/p/w500/wnUAcUrMRGPPZUDroLeZhSjLkuu.jpg",
+        description: "A robot child programmed to love searches for belonging, making it one of the most emotional artificial-human stories.",
+        tags: ["Robot child", "Love", "Spielberg"],
+        providers: ["SkyShowtime", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/2867-artificial-intelligence-ai/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=A.I.%20Artificial%20Intelligence"
+      },
+      {
+        title: "Prometheus",
+        year: 2012,
+        rating: "David",
+        theme: "Alien Synthetic",
+        poster: "https://image.tmdb.org/t/p/w500/m7nZCtHJyDLncBUarfM5h5mrppx.jpg",
+        description: "A deep-space origin story where the android David becomes the most fascinating character: curious, elegant and morally unreadable.",
+        tags: ["Alien universe", "Android David", "Origins"],
+        providers: ["Netflix", "Disney+", "Prime Video", "HBO Max", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/10907-prometheus/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Prometheus"
+      },
+      {
+        title: "Alien: Covenant",
+        year: 2017,
+        rating: "Synthetic",
+        theme: "Alien Synthetic",
+        poster: "https://image.tmdb.org/t/p/w500/zecMELPbU5YMQpC81Z8ImaaXuf9.jpg",
+        description: "A darker continuation of David’s synthetic-human arc, blending creation, obsession, horror and the Alien mythology.",
+        tags: ["David/Walter", "Alien horror", "Creation"],
+        providers: ["Disney+", "HBO Max", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/100681-alien-covenant/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Alien%20Covenant"
+      },
+      {
+        title: "Chappie",
+        year: 2015,
+        rating: "Learning",
+        theme: "AI Consciousness",
+        poster: "https://image.tmdb.org/t/p/w500/saF3HtAduvrP9ytXDxSnQJP3oqx.jpg",
+        description: "A police robot is reprogrammed into a self-aware childlike machine, mixing action, crime and questions about learning consciousness.",
+        tags: ["Self-aware robot", "Learning", "Neill Blomkamp"],
+        providers: ["Netflix", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/96391-chappie/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Chappie"
+      },
+      {
+        title: "Terminator 2: Judgment Day",
+        year: 1991,
+        rating: "T-800",
+        theme: "Robot Action",
+        poster: "https://image.tmdb.org/t/p/w500/5M0j0B18abtBI5gi2RhfjjurTqb.jpg",
+        description: "The best robot-action classic: killer machines, time travel, AI apocalypse and a cyborg protector learning human values.",
+        tags: ["Cyborg", "Skynet", "Action classic"],
+        providers: ["Netflix", "Prime Video", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/2812-terminator-2-judgment-day/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Terminator%202%20Judgment%20Day"
+      },
+      {
+        title: "The Terminator",
+        year: 1984,
+        rating: "Threat",
+        theme: "Robot Action",
+        poster: "https://image.tmdb.org/t/p/w500/qvktm0BHcnmDpul4Hz01GIazWPr.jpg",
+        description: "A relentless cyborg assassin travels back in time, introducing one of cinema’s strongest AI-apocalypse mythologies.",
+        tags: ["Cyborg", "AI apocalypse", "Classic"],
+        providers: ["Prime Video", "HBO Max", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/2810-the-terminator/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=The%20Terminator"
+      },
+      {
+        title: "WALL·E",
+        year: 2008,
+        rating: "Family",
+        theme: "Family Robot",
+        poster: "https://image.tmdb.org/t/p/w500/hbhFnRzzg6ZDmm8YAmxBnQpQIPh.jpg",
+        description: "A lonely waste-collector robot becomes a surprisingly expressive hero in a warm story about love, Earth and machine personality.",
+        tags: ["Family", "Robot emotion", "Pixar"],
+        providers: ["Disney+", "Pathé Thuis"],
+        filmVandaag: "https://www.filmvandaag.nl/film/5873-walle/online-kijken",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=WALL-E"
+      },
+      {
+        title: "Bicentennial Man",
+        year: 1999,
+        rating: "Humanity",
+        theme: "Synthetic Human",
+        poster: "https://image.tmdb.org/t/p/w500/wrs23eO0VEWwOQpXoOasMnlW9Y4.jpg",
+        description: "A domestic robot gradually develops creativity, emotion and legal personhood, making it a gentle long-form story about becoming human.",
+        tags: ["Becoming human", "Emotional", "Robot rights"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Bicentennial%20Man",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Bicentennial%20Man"
+      }
+    ];
+
+    const grid = document.getElementById('movieGrid');
+    const search = document.getElementById('search');
+    const theme = document.getElementById('theme');
+    const sort = document.getElementById('sort');
+    const emptyState = document.getElementById('emptyState');
+    const movieCount = document.getElementById('movieCount');
+
+    function render() {
+      const query = search.value.trim().toLowerCase();
+      const selectedTheme = theme.value;
+
+      let filtered = movies.filter(movie => {
+        const haystack = [
+          movie.title,
+          movie.year,
+          movie.theme,
+          movie.description,
+          ...movie.tags,
+          ...movie.providers
+        ].join(' ').toLowerCase();
+
+        const matchesQuery = !query || haystack.includes(query);
+        const matchesTheme = selectedTheme === 'all' || movie.theme === selectedTheme;
+        return matchesQuery && matchesTheme;
+      });
+
+      if (sort.value === 'yearDesc') filtered.sort((a, b) => b.year - a.year);
+      if (sort.value === 'yearAsc') filtered.sort((a, b) => a.year - b.year);
+      if (sort.value === 'title') filtered.sort((a, b) => a.title.localeCompare(b.title));
+
+      grid.innerHTML = filtered.map(movie => `
+        <article class="movie-card">
+          <div class="poster-wrap">
+            <img src="${movie.poster}" alt="${movie.title} poster" loading="lazy" onerror="this.remove()" />
+            <div class="poster-fallback">${movie.title}</div>
+            <div class="rating">${movie.rating}</div>
+          </div>
+          <div class="content">
+            <div class="movie-title">
+              <h2>${movie.title}</h2>
+              <span class="year">${movie.year}</span>
+            </div>
+            <p class="desc">${movie.description}</p>
+            <div class="tags">
+              ${movie.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
+            </div>
+            <div class="where">
+              <div class="where-title">Where to watch in NL</div>
+              <div class="providers">
+                ${movie.providers.map(provider => `<span class="provider">${provider}</span>`).join('')}
+              </div>
+              <div class="links">
+                <a class="btn primary" href="${movie.justWatch}" target="_blank" rel="noreferrer">Check JustWatch</a>
+                <a class="btn" href="${movie.filmVandaag}" target="_blank" rel="noreferrer">FilmVandaag</a>
+              </div>
+            </div>
+          </div>
+        </article>
+      `).join('');
+
+      movieCount.textContent = filtered.length;
+      emptyState.style.display = filtered.length ? 'none' : 'block';
+    }
+
+    search.addEventListener('input', render);
+    theme.addEventListener('change', render);
+    sort.addEventListener('change', render);
+
+    render();
+  </script>
+</body>
+</html>
