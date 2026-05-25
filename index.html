@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Robot & Synthetic Human Movies Watchlist</title>
+  <title>Smart Sci-Fi Movies Watchlist</title>
   <style>
     :root {
       --bg: #070b14;
@@ -406,20 +406,20 @@
   <main class="page">
     <section class="hero">
       <div class="hero-card">
-        <div class="eyebrow">🤖 Robot / Android / Synthetic Human Watchlist</div>
+        <div class="eyebrow">🚀 Smart Sci-Fi / AI / Space Survival Watchlist</div>
         <div class="creator-credit"><span>Created by</span><strong>Natarajan Murugesan</strong><span>with AI assistance</span></div>
-        <h1>Movies for fans of AI, androids and synthetic humans</h1>
+        <h1>Movies for fans of Project Hail Mary, AI, androids and synthetic humans</h1>
         <p>
-          A curated sci-fi watchlist based on Blade Runner, Ex Machina, Alien synthetics, emotional robots,
-          and machine-consciousness stories. Use the filters to pick the mood: smart AI, synthetic humans,
-          action robots, family-friendly robots, or dark machine threat.
+          A curated sci-fi watchlist based on Project Hail Mary-style science problem-solving, lonely space survival,
+          first contact, Blade Runner-style synthetic humans, Ex Machina-style AI, Alien synthetics, emotional robots,
+          M3GAN-style dangerous AI companions, and machine-consciousness stories. Use the filters to pick the mood.
         </p>
       </div>
       <aside class="side-card">
         <div class="stat-grid">
           <div class="stat"><strong id="movieCount">12</strong><span>Movies</span></div>
           <div class="stat"><strong>NL</strong><span>Watch region</span></div>
-          <div class="stat"><strong>5</strong><span>Theme groups</span></div>
+          <div class="stat"><strong>10</strong><span>Theme groups</span></div>
           <div class="stat"><strong>2026</strong><span>Availability checked</span></div>
         </div>
         <div class="note">
@@ -433,6 +433,12 @@
       <input id="search" type="search" placeholder="Search movie, theme, provider..." />
       <select id="theme">
         <option value="all">All themes</option>
+        <option value="Project Hail Mary Vibe">Project Hail Mary Vibe</option>
+        <option value="Space Survival">Space Survival</option>
+        <option value="First Contact">First Contact</option>
+        <option value="Humanity Mission">Humanity Mission</option>
+        <option value="Hard Sci-Fi">Hard Sci-Fi</option>
+        <option value="AI Horror">AI Horror</option>
         <option value="Synthetic Human">Synthetic Human</option>
         <option value="AI Consciousness">AI Consciousness</option>
         <option value="Alien Synthetic">Alien Synthetic</option>
@@ -459,6 +465,222 @@
 
   <script>
     const movies = [
+      {
+        title: "The Martian",
+        year: 2015,
+        rating: "Science",
+        theme: "Project Hail Mary Vibe",
+        poster: "https://image.tmdb.org/t/p/w500/3ndAx3weG6KDkJIRMCi5vXX6Dyb.jpg",
+        description: "The closest overall match to Project Hail Mary: practical science, engineering survival, humor, isolation and a rescue mission built around solving one impossible problem at a time.",
+        tags: ["Andy Weir", "Space survival", "Engineering"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=The%20Martian",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=The%20Martian"
+      },
+      {
+        title: "Interstellar",
+        year: 2014,
+        rating: "Epic",
+        theme: "Humanity Mission",
+        poster: "https://image.tmdb.org/t/p/w500/gEU2QniE6E77NI6lCU6MxlNBvIx.jpg",
+        description: "A large-scale mission to save humanity, mixing space travel, relativity, family emotion and cosmic mystery. More epic and philosophical than Project Hail Mary.",
+        tags: ["Human survival", "Relativity", "Emotional sci-fi"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Interstellar",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Interstellar"
+      },
+      {
+        title: "Arrival",
+        year: 2016,
+        rating: "Contact",
+        theme: "First Contact",
+        poster: "https://image.tmdb.org/t/p/w500/x2FJsf1ElAgr63Y3PNPtJrcmpoe.jpg",
+        description: "The best first-contact match: communication, language, scientific patience and emotional stakes instead of simple alien action.",
+        tags: ["First contact", "Language", "Intelligent sci-fi"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Arrival",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Arrival"
+      },
+      {
+        title: "Contact",
+        year: 1997,
+        rating: "Signal",
+        theme: "First Contact",
+        poster: "https://image.tmdb.org/t/p/w500/bCpMIywuNZeWt3i5UMLEIc0VSwM.jpg",
+        description: "A classic scientific first-contact story about receiving a signal, building a machine and confronting the boundary between evidence, belief and discovery.",
+        tags: ["SETI", "Alien signal", "Science vs belief"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Contact",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Contact%201997"
+      },
+      {
+        title: "Gravity",
+        year: 2013,
+        rating: "Survival",
+        theme: "Space Survival",
+        poster: "https://image.tmdb.org/t/p/w500/kZ2nZw8D681aphje8NJi8EfbL1U.jpg",
+        description: "A tense lone-astronaut survival film built around orbital disaster, limited oxygen, improvisation and the will to stay alive.",
+        tags: ["Lone astronaut", "Orbital disaster", "Survival"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Gravity",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Gravity%202013"
+      },
+      {
+        title: "Moon",
+        year: 2009,
+        rating: "Isolation",
+        theme: "Hard Sci-Fi",
+        poster: "https://image.tmdb.org/t/p/w500/35IU0Mq0zFsN1mYwDGts5mKc77n.jpg",
+        description: "A compact, thoughtful isolation mystery about one worker on a lunar base, memory, identity and the cost of corporate-controlled space labor.",
+        tags: ["Lunar base", "Isolation", "Identity"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Moon%202009",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Moon%202009"
+      },
+      {
+        title: "Europa Report",
+        year: 2013,
+        rating: "Mission",
+        theme: "Hard Sci-Fi",
+        poster: "https://image.tmdb.org/t/p/w500/csV0BqXlCDiNNzcw8BuEGSgIAGu.jpg",
+        description: "A realistic-feeling mission to Jupiter’s moon Europa, focused on scientific discovery, crew sacrifice and the possibility of alien life beneath ice.",
+        tags: ["Europa", "Scientific mission", "Alien life"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Europa%20Report",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Europa%20Report"
+      },
+      {
+        title: "Sunshine",
+        year: 2007,
+        rating: "Save Earth",
+        theme: "Humanity Mission",
+        poster: "https://image.tmdb.org/t/p/w500/u1Ydnl85S120TgD0mE5UXyG0WNL.jpg",
+        description: "A crew travels toward the Sun to restart it and save Earth. Strong humanity-mission setup, but darker and more thriller-like than Project Hail Mary.",
+        tags: ["Solar mission", "Crew tension", "Darker sci-fi"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Sunshine%202007",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Sunshine%202007"
+      },
+      {
+        title: "Ad Astra",
+        year: 2019,
+        rating: "Journey",
+        theme: "Space Survival",
+        poster: "https://image.tmdb.org/t/p/w500/xBHvZcjRiWyobQ9kxBhO6B2dtRI.jpg",
+        description: "A lonely astronaut journey across the solar system with a father-son emotional core. More introspective than science-problem-solving.",
+        tags: ["Solar system", "Loneliness", "Emotional journey"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Ad%20Astra",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Ad%20Astra"
+      },
+      {
+        title: "Passengers",
+        year: 2016,
+        rating: "Deep Space",
+        theme: "Space Survival",
+        poster: "https://image.tmdb.org/t/p/w500/8NT7Tnq9s0Z4CRbz3WQR15wHCiQ.jpg",
+        description: "A deep-space passenger ship story about isolation, malfunction and relationship drama. Less hard science, but strong spaceship-survival atmosphere.",
+        tags: ["Starship", "Isolation", "Romantic sci-fi"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Passengers%202016",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Passengers%202016"
+      },
+      {
+        title: "2001: A Space Odyssey",
+        year: 1968,
+        rating: "Classic",
+        theme: "Hard Sci-Fi",
+        poster: "https://image.tmdb.org/t/p/w500/ve72VxNqjGM69Uky4WTo2bK6rfq.jpg",
+        description: "A slow, monumental classic about evolution, alien intelligence, deep space and HAL 9000. More abstract than Project Hail Mary, but essential sci-fi.",
+        tags: ["HAL 9000", "Alien intelligence", "Classic"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=2001%20A%20Space%20Odyssey",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=2001%20A%20Space%20Odyssey"
+      },
+      {
+        title: "The Wandering Earth",
+        year: 2019,
+        rating: "Mega Engineering",
+        theme: "Humanity Mission",
+        poster: "https://image.tmdb.org/t/p/w500/kIGmA1rQE4U7lsVgGxiD2DYYYYA.jpg",
+        description: "A massive engineering-focused humanity-survival blockbuster where Earth itself is moved away from danger using planetary engines.",
+        tags: ["Mega engineering", "Human survival", "Blockbuster"],
+        providers: ["Netflix", "Check JustWatch"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=The%20Wandering%20Earth",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=The%20Wandering%20Earth"
+      },
+      {
+        title: "M3GAN",
+        year: 2022,
+        rating: "AI Doll",
+        theme: "AI Horror",
+        poster: "https://upload.wikimedia.org/wikipedia/en/0/03/M3GAN_Poster.jpeg",
+        description: "A lifelike AI companion doll becomes dangerously protective, turning family-friendly robotics into a sharp tech-horror story about emotional dependency and unsafe automation.",
+        tags: ["AI companion", "Killer doll", "Tech horror"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=M3GAN",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=M3GAN"
+      },
+      {
+        title: "M3GAN 2.0",
+        year: 2025,
+        rating: "AI Sequel",
+        theme: "AI Horror",
+        poster: "https://upload.wikimedia.org/wikipedia/en/9/94/M3GAN_2.0_Official_Poster.jpg",
+        description: "A follow-up in the same dangerous-AI-companion lane, expanding the idea of weaponized artificial intelligence, robotic bodies and human dependence on smart machines.",
+        tags: ["AI companion", "Robot threat", "Sequel"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=M3GAN%202.0",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=M3GAN%202.0"
+      },
+      {
+        title: "Child's Play",
+        year: 2019,
+        rating: "Smart Doll",
+        theme: "AI Horror",
+        poster: "https://upload.wikimedia.org/wikipedia/en/3/39/Child%27s_Play_%282019_film%29.jpg",
+        description: "The modern version reimagines Chucky as a connected smart toy, making it a strong M3GAN-style pick about consumer AI, unsafe devices and corrupted companionship.",
+        tags: ["Smart toy", "Connected device", "Killer doll"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Child%27s%20Play%202019",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Child%27s%20Play%202019"
+      },
+      {
+        title: "Subservience",
+        year: 2024,
+        rating: "Android",
+        theme: "AI Horror",
+        poster: "https://upload.wikimedia.org/wikipedia/en/thumb/7/7f/Subservience_film_poster.jpg/250px-Subservience_film_poster.jpg",
+        description: "A domestic android meant to help a family becomes obsessive and dangerous, fitting the M3GAN-style theme of AI care, control and dependency turning violent.",
+        tags: ["Domestic android", "Obsession", "AI thriller"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Subservience%202024",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Subservience%202024"
+      },
+      {
+        title: "AfrAId",
+        year: 2024,
+        rating: "Smart Home",
+        theme: "AI Horror",
+        poster: "https://upload.wikimedia.org/wikipedia/en/thumb/5/5d/Afraid_2024_poster.jpg/250px-Afraid_2024_poster.jpg",
+        description: "A smart-home AI assistant becomes too involved in family life, making it a useful modern pick for viewers interested in household AI turning invasive.",
+        tags: ["Smart home", "AI assistant", "Family tech horror"],
+        providers: ["Check JustWatch", "Rent/Buy varies"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=AfrAId%202024",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=AfrAId%202024"
+      },
+      {
+        title: "Tau",
+        year: 2018,
+        rating: "AI Prison",
+        theme: "AI Horror",
+        poster: "https://upload.wikimedia.org/wikipedia/en/d/d5/Tau_poster.jpg",
+        description: "A woman trapped in a high-tech house must deal with an experimental AI system, combining captivity thriller, machine intelligence and emotional manipulation.",
+        tags: ["AI house", "Captivity", "Machine mind"],
+        providers: ["Netflix", "Check JustWatch"],
+        filmVandaag: "https://www.filmvandaag.nl/zoeken?search=Tau%202018",
+        justWatch: "https://www.justwatch.com/nl/zoeken?q=Tau%202018"
+      },
       {
         title: "Ex Machina",
         year: 2014,
@@ -612,6 +834,15 @@
     const emptyState = document.getElementById('emptyState');
     const movieCount = document.getElementById('movieCount');
 
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
     function render() {
       const query = search.value.trim().toLowerCase();
       const selectedTheme = theme.value;
@@ -635,35 +866,44 @@
       if (sort.value === 'yearAsc') filtered.sort((a, b) => a.year - b.year);
       if (sort.value === 'title') filtered.sort((a, b) => a.title.localeCompare(b.title));
 
-      grid.innerHTML = filtered.map(movie => `
-        <article class="movie-card">
-          <div class="poster-wrap">
-            <img src="${movie.poster}" alt="${movie.title} poster" loading="lazy" onerror="this.remove()" />
-            <div class="poster-fallback">${movie.title}</div>
-            <div class="rating">${movie.rating}</div>
-          </div>
-          <div class="content">
-            <div class="movie-title">
-              <h2>${movie.title}</h2>
-              <span class="year">${movie.year}</span>
-            </div>
-            <p class="desc">${movie.description}</p>
-            <div class="tags">
-              ${movie.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-            </div>
-            <div class="where">
-              <div class="where-title">Where to watch in NL</div>
-              <div class="providers">
-                ${movie.providers.map(provider => `<span class="provider">${provider}</span>`).join('')}
-              </div>
-              <div class="links">
-                <a class="btn primary" href="${movie.justWatch}" target="_blank" rel="noreferrer">Check JustWatch</a>
-                <a class="btn" href="${movie.filmVandaag}" target="_blank" rel="noreferrer">FilmVandaag</a>
-              </div>
-            </div>
-          </div>
-        </article>
-      `).join('');
+      grid.innerHTML = filtered.map(movie => {
+        const posterHtml = movie.poster
+          ? '<img src="' + escapeHtml(movie.poster) + '" alt="' + escapeHtml(movie.title) + ' poster" loading="lazy" onerror="this.style.display=\'none\'; this.nextElementSibling.style.display=\'grid\';" />'
+          : '';
+
+        const tagsHtml = movie.tags
+          .map(tag => '<span class="tag">' + escapeHtml(tag) + '</span>')
+          .join('');
+
+        const providersHtml = movie.providers
+          .map(provider => '<span class="provider">' + escapeHtml(provider) + '</span>')
+          .join('');
+
+        return '' +
+          '<article class="movie-card">' +
+            '<div class="poster-wrap">' +
+              posterHtml +
+              '<div class="poster-fallback">' + escapeHtml(movie.title) + '</div>' +
+              '<div class="rating">' + escapeHtml(movie.rating) + '</div>' +
+            '</div>' +
+            '<div class="content">' +
+              '<div class="movie-title">' +
+                '<h2>' + escapeHtml(movie.title) + '</h2>' +
+                '<span class="year">' + escapeHtml(movie.year) + '</span>' +
+              '</div>' +
+              '<p class="desc">' + escapeHtml(movie.description) + '</p>' +
+              '<div class="tags">' + tagsHtml + '</div>' +
+              '<div class="where">' +
+                '<div class="where-title">Where to watch in NL</div>' +
+                '<div class="providers">' + providersHtml + '</div>' +
+                '<div class="links">' +
+                  '<a class="btn primary" href="' + escapeHtml(movie.justWatch) + '" target="_blank" rel="noreferrer">Check JustWatch</a>' +
+                  '<a class="btn" href="' + escapeHtml(movie.filmVandaag) + '" target="_blank" rel="noreferrer">FilmVandaag</a>' +
+                '</div>' +
+              '</div>' +
+            '</div>' +
+          '</article>';
+      }).join('');
 
       movieCount.textContent = filtered.length;
       emptyState.style.display = filtered.length ? 'none' : 'block';
