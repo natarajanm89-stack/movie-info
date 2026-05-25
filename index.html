@@ -530,6 +530,45 @@
       animation: nameScan 5.5s ease-in-out infinite 2s;
       pointer-events: none;
     }
+
+    /* ── Language switcher ──────────────────────────── */
+    .lang-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .lang-label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    .lang-switcher { display: flex; gap: 6px; }
+    .lang-btn {
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.11);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background 150ms, border-color 150ms, color 150ms, transform 120ms;
+    }
+    .lang-btn:hover {
+      background: rgba(255,255,255,0.12);
+      color: var(--text);
+      transform: translateY(-1px);
+    }
+    .lang-btn.active {
+      background: rgba(113,245,255,0.13);
+      border-color: rgba(113,245,255,0.38);
+      color: var(--accent);
+    }
   </style>
 </head>
 <body>
@@ -559,6 +598,15 @@
         </div>
       </aside>
     </section>
+
+    <div class="lang-row">
+      <span class="lang-label">Language</span>
+      <div class="lang-switcher">
+        <button class="lang-btn active" data-lang="en">🇬🇧 English</button>
+        <button class="lang-btn" data-lang="nl">🇳🇱 Nederlands</button>
+        <button class="lang-btn" data-lang="ta">🇮🇳 தமிழ்</button>
+      </div>
+    </div>
 
     <section class="toolbar" aria-label="Movie filters">
       <input id="search" type="search" placeholder="Search movie, theme, provider..." />
@@ -1025,10 +1073,10 @@
               '<p class="desc">' + escapeHtml(movie.description) + '</p>' +
               '<div class="tags">' + tagsHtml + '</div>' +
               '<div class="where">' +
-                '<div class="where-title">Where to watch in NL</div>' +
+                '<div class="where-title">' + (translations[currentLang]||translations.en).whereToWatch + '</div>' +
                 '<div class="providers">' + providersHtml + '</div>' +
                 '<div class="links">' +
-                  '<a class="btn primary" href="' + escapeHtml(movie.justWatch) + '" target="_blank" rel="noreferrer">Check JustWatch</a>' +
+                  '<a class="btn primary" href="' + escapeHtml(movie.justWatch) + '" target="_blank" rel="noreferrer">' + (translations[currentLang]||translations.en).checkJW + '</a>' +
                   '<a class="btn" href="' + escapeHtml(movie.filmVandaag) + '" target="_blank" rel="noreferrer">FilmVandaag</a>' +
                 '</div>' +
               '</div>' +
@@ -1043,6 +1091,103 @@
     search.addEventListener('input', render);
     theme.addEventListener('change', render);
     sort.addEventListener('change', render);
+
+    // ── i18n ───────────────────────────────────────────
+    let currentLang = 'en';
+
+    const translations = {
+      en: {
+        eyebrow: '🚀 Smart Sci-Fi / AI / Space Survival Watchlist',
+        createdBy: 'Created by', withAI: 'with AI assistance',
+        h1: 'Movies for fans of Project Hail Mary, AI, androids and synthetic humans',
+        subtitle: 'A curated sci-fi watchlist based on Project Hail Mary-style science problem-solving, lonely space survival, first contact, Blade Runner-style synthetic humans, Ex Machina-style AI, Alien synthetics, emotional robots, M3GAN-style dangerous AI companions, and machine-consciousness stories. Use the filters to pick the mood.',
+        statMovies: 'Movies', statRegion: 'Watch region', statThemes: 'Theme groups', statChecked: 'Availability checked',
+        sideNote: 'Streaming availability changes frequently. Provider chips show currently found Netherlands options or best search links. Use the JustWatch / FilmVandaag buttons before renting or subscribing.',
+        searchPlaceholder: 'Search movie, theme, provider...',
+        themeAll: 'All themes',
+        sortRecommended: 'Recommended order', sortNewest: 'Newest first', sortOldest: 'Oldest first', sortTitle: 'Title A–Z',
+        whereToWatch: 'Where to watch in NL', checkJW: 'Check JustWatch',
+        empty: 'No movies matched your filters.',
+        footerMain: 'Created by Natarajan Murugesan with AI assistance.',
+        footerSub: 'Poster thumbnails are loaded from public movie-poster CDN paths where available. If a poster fails to load, the card title fallback remains visible. This page is designed as a practical watchlist, not a permanent streaming database.',
+      },
+      nl: {
+        eyebrow: '🚀 Slimme Sci-Fi / AI / Ruimteoverleving Watchlist',
+        createdBy: 'Gemaakt door', withAI: 'met AI-hulp',
+        h1: 'Films voor fans van Project Hail Mary, AI, androïden en synthetische mensen',
+        subtitle: 'Een samengestelde sci-fi kijklijst gebaseerd op Project Hail Mary-stijl wetenschappelijk probleemoplossen, eenzame ruimteoverleving, eerste contact, Blade Runner-stijl synthetische mensen, Ex Machina-stijl AI, Alien synthetics, emotionele robots, M3GAN-stijl gevaarlijke AI-metgezellen en machine-bewustzijnsverhalen. Gebruik de filters om de stemming te kiezen.',
+        statMovies: 'Films', statRegion: 'Kijkregio', statThemes: 'Themagroepen', statChecked: 'Beschikbaarheid gecontroleerd',
+        sideNote: 'Streamingbeschikbaarheid verandert vaak. Provider-chips tonen gevonden Nederlandse opties of beste zoeklinks. Gebruik de JustWatch / FilmVandaag-knoppen vóór huren of abonneren.',
+        searchPlaceholder: 'Zoek film, thema, aanbieder...',
+        themeAll: "Alle thema's",
+        sortRecommended: 'Aanbevolen volgorde', sortNewest: 'Nieuwste eerst', sortOldest: 'Oudste eerst', sortTitle: 'Titel A–Z',
+        whereToWatch: 'Waar te kijken in NL', checkJW: 'Controleer JustWatch',
+        empty: 'Geen films gevonden voor uw filters.',
+        footerMain: 'Gemaakt door Natarajan Murugesan met AI-hulp.',
+        footerSub: 'Posterminiaturen worden geladen van openbare CDN-paden. Als een poster niet laadt, blijft de kaarttiteltekst zichtbaar. Deze pagina is een praktische kijklijst, geen permanente streamingdatabase.',
+      },
+      ta: {
+        eyebrow: '🚀 சிறந்த அறிவியல் புனைவு / AI / விண்வெளி தப்பிப்பிழைத்தல்',
+        createdBy: 'உருவாக்கியவர்', withAI: 'AI உதவியுடன்',
+        h1: 'Project Hail Mary, AI, ஆண்ட்ராய்டுகள் மற்றும் செயற்கை மனிதர்களின் ரசிகர்களுக்கான திரைப்படங்கள்',
+        subtitle: 'Project Hail Mary-பாணி அறிவியல் சிக்கல் தீர்வு, தனிமையான விண்வெளி தப்பிப்பிழைத்தல், முதல் தொடர்பு, Blade Runner-பாணி செயற்கை மனிதர்கள், Ex Machina-பாணி AI, Alien செயற்கை மனிதர்கள், உணர்வுள்ள ரோபோக்கள், M3GAN-பாணி ஆபத்தான AI துணைவர்கள் மற்றும் இயந்திர விழிப்புணர்வு கதைகளை அடிப்படையாகக் கொண்ட தொகுக்கப்பட்ட அறிவியல் புனைவு பார்வைப் பட்டியல். மனநிலை தேர்ந்தெடுக்க வடிகட்டிகளைப் பயன்படுத்தவும்.',
+        statMovies: 'திரைப்படங்கள்', statRegion: 'பார்க்கும் பகுதி', statThemes: 'கருப்பொருள் குழுக்கள்', statChecked: 'கிடைக்கும் தன்மை சரிபார்க்கப்பட்டது',
+        sideNote: 'ஸ்ட்ரீமிங் கிடைக்கும் தன்மை அடிக்கடி மாறுகிறது. வழங்குநர் சிப்கள் நெதர்லாந்து விருப்பங்களைக் காட்டுகின்றன. வாடகை அல்லது சந்தாவுக்கு முன் JustWatch / FilmVandaag பொத்தான்களைப் பயன்படுத்தவும்.',
+        searchPlaceholder: 'திரைப்படம், கருப்பொருள், வழங்குநர் தேடவும்...',
+        themeAll: 'அனைத்து கருப்பொருள்கள்',
+        sortRecommended: 'பரிந்துரைக்கப்பட்ட வரிசை', sortNewest: 'புதியது முதலில்', sortOldest: 'பழையது முதலில்', sortTitle: 'தலைப்பு A–Z',
+        whereToWatch: 'NL இல் எங்கே பார்க்கலாம்', checkJW: 'JustWatch சரிபார்க்கவும்',
+        empty: 'உங்கள் வடிகட்டிகளுக்கு பொருந்தும் திரைப்படங்கள் இல்லை.',
+        footerMain: 'Natarajan Murugesan AI உதவியுடன் உருவாக்கினார்.',
+        footerSub: 'திரைப்பட போஸ்டர் சிறுபடங்கள் பொது CDN பாதைகளிலிருந்து ஏற்றப்படுகின்றன. போஸ்டர் ஏற்றப்படவில்லை என்றால் அட்டை தலைப்பு காட்டப்படும். இந்தப் பக்கம் ஒரு நடைமுறை கண்காணிப்புப் பட்டியலாக வடிவமைக்கப்பட்டுள்ளது.',
+      },
+    };
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      const t = translations[lang];
+      document.documentElement.lang = lang;
+
+      document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === lang));
+
+      document.querySelector('.eyebrow').textContent = t.eyebrow;
+
+      const ccSpans = document.querySelectorAll('.creator-credit > span');
+      if (ccSpans[0]) ccSpans[0].textContent = t.createdBy;
+      if (ccSpans[2]) ccSpans[2].textContent = t.withAI;
+
+      const h1 = document.querySelector('.hero-card h1');
+      h1.innerHTML = t.h1.split(/\s+/).map(function (w) {
+        return '<span class="hero-word"><span class="hero-word-inner" style="animation:none;transform:translateY(0)">' + w + '</span></span>';
+      }).join(' ');
+
+      const p = document.querySelector('.hero-card > p');
+      p.style.opacity = '1';
+      p.innerHTML = t.subtitle.split(' ').map(function (w) {
+        return '<span style="display:inline-block;opacity:1;filter:none;transform:none">' + w + '</span>';
+      }).join(' ');
+
+      const statSpans = document.querySelectorAll('.stat span');
+      ['statMovies','statRegion','statThemes','statChecked'].forEach(function (k, i) {
+        if (statSpans[i]) statSpans[i].textContent = t[k];
+      });
+
+      document.querySelector('.note').textContent = t.sideNote;
+      document.getElementById('search').placeholder = t.searchPlaceholder;
+      document.querySelector('#theme option[value="all"]').textContent = t.themeAll;
+
+      const sortKeys = ['sortRecommended','sortNewest','sortOldest','sortTitle'];
+      document.querySelectorAll('#sort option').forEach(function (o, i) {
+        if (sortKeys[i]) o.textContent = t[sortKeys[i]];
+      });
+
+      document.getElementById('emptyState').textContent = t.empty;
+
+      const footer = document.querySelector('footer');
+      footer.innerHTML = '<strong>' + t.footerMain + '</strong><br />' + t.footerSub;
+
+      render();
+    }
 
     render();
 
@@ -1143,6 +1288,11 @@
       if (statEls[2]) countUp(statEls[2], 10, 900);
       if (statEls[3]) countUp(statEls[3], 2026, 1100);
     })();
+
+    // ── Language button listeners ──────────────────────
+    document.querySelectorAll('.lang-btn').forEach(function (btn) {
+      btn.addEventListener('click', function () { setLanguage(btn.dataset.lang); });
+    });
   </script>
 </body>
 </html>
