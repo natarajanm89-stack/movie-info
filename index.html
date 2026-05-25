@@ -440,8 +440,22 @@
 
     .eyebrow { animation: eyebrowDrop 0.8s cubic-bezier(0.22,1,0.36,1) 0.45s both; }
     .creator-credit { animation: heroFadeUp 0.8s cubic-bezier(0.22,1,0.36,1) 0.6s both; }
-    .hero-card h1 { animation: heroFadeUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.75s both; }
-    .hero-card > p { animation: heroFadeUp 0.9s cubic-bezier(0.22,1,0.36,1) 0.9s both; }
+    .hero-card > p { opacity: 0; } /* JS blur-wave takes over */
+    @keyframes wordReveal {
+      from { transform: translateY(112%); }
+      to   { transform: translateY(0); }
+    }
+    .hero-word {
+      display: inline-block;
+      overflow: hidden;
+      vertical-align: bottom;
+      padding-bottom: 0.05em;
+      line-height: inherit;
+    }
+    .hero-word-inner {
+      display: inline-block;
+      animation: wordReveal 0.68s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
     .side-card { animation: sideSlideIn 1s cubic-bezier(0.22,1,0.36,1) 0.25s both; }
 
     .stat { animation: heroFadeUp 0.8s cubic-bezier(0.22,1,0.36,1) both; }
@@ -1075,6 +1089,40 @@
       seed();
       draw();
       new ResizeObserver(() => { resize(); seed(); }).observe(canvas.parentElement);
+    })();
+
+    // ── H1 word-by-word clip reveal ────────────────────
+    (function () {
+      const h1 = document.querySelector('.hero-card h1');
+      if (!h1) return;
+      const words = h1.textContent.trim().split(/\s+/);
+      h1.innerHTML = words.map(function (word, i) {
+        const d = (0.75 + i * 0.07).toFixed(2);
+        return '<span class="hero-word"><span class="hero-word-inner" style="animation-delay:' + d + 's">' + word + '</span></span>';
+      }).join(' ');
+    })();
+
+    // ── Subtitle blur-wave reveal ───────────────────────
+    (function () {
+      const p = document.querySelector('.hero-card > p');
+      if (!p) return;
+      const words = p.textContent.trim().replace(/\s+/g, ' ').split(' ');
+      p.style.opacity = '1';
+      p.innerHTML = words.map(function (word, i) {
+        const d = (1.15 + i * 0.032).toFixed(3);
+        return '<span style="display:inline-block;opacity:0;filter:blur(8px);transform:translateY(9px);' +
+               'transition:opacity 0.5s ' + d + 's ease,filter 0.5s ' + d + 's ease,transform 0.5s ' + d + 's ease">' +
+               word + '</span>';
+      }).join(' ');
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          p.querySelectorAll('span').forEach(function (s) {
+            s.style.opacity = '1';
+            s.style.filter = 'blur(0px)';
+            s.style.transform = 'translateY(0)';
+          });
+        });
+      });
     })();
 
     // ── Stat counter ───────────────────────────────────
