@@ -1058,6 +1058,10 @@
           .map(provider => '<span class="provider">' + escapeHtml(provider) + '</span>')
           .join('');
 
+        const desc = (currentLang !== 'en' && movieDesc[currentLang] && movieDesc[currentLang][movie.title])
+          ? movieDesc[currentLang][movie.title]
+          : movie.description;
+
         return '' +
           '<article class="movie-card">' +
             '<div class="poster-wrap">' +
@@ -1070,7 +1074,7 @@
                 '<h2>' + escapeHtml(movie.title) + '</h2>' +
                 '<span class="year">' + escapeHtml(movie.year) + '</span>' +
               '</div>' +
-              '<p class="desc">' + escapeHtml(movie.description) + '</p>' +
+              '<p class="desc">' + escapeHtml(desc) + '</p>' +
               '<div class="tags">' + tagsHtml + '</div>' +
               '<div class="where">' +
                 '<div class="where-title">' + (translations[currentLang]||translations.en).whereToWatch + '</div>' +
@@ -1140,6 +1144,73 @@
         empty: 'உங்கள் வடிகட்டிகளுக்கு பொருந்தும் திரைப்படங்கள் இல்லை.',
         footerMain: 'Natarajan Murugesan AI உதவியுடன் உருவாக்கினார்.',
         footerSub: 'திரைப்பட போஸ்டர் சிறுபடங்கள் பொது CDN பாதைகளிலிருந்து ஏற்றப்படுகின்றன. போஸ்டர் ஏற்றப்படவில்லை என்றால் அட்டை தலைப்பு காட்டப்படும். இந்தப் பக்கம் ஒரு நடைமுறை கண்காணிப்புப் பட்டியலாக வடிவமைக்கப்பட்டுள்ளது.',
+      },
+    };
+
+    const movieDesc = {
+      nl: {
+        'The Martian': 'De beste overeenkomst met Project Hail Mary: praktische wetenschap, ingenieuze overleving, humor, isolatie en een reddingsmissie opgebouwd rond het één voor één oplossen van onmogelijke problemen.',
+        'Interstellar': 'Een grootschalige missie om de mensheid te redden, met ruimtevaart, relativiteit, familie-emotie en kosmisch mysterie. Meer episch en filosofisch dan Project Hail Mary.',
+        'Arrival': 'De beste eerste-contactmatch: communicatie, taal, wetenschappelijk geduld en emotionele inzet in plaats van simpele buitenaardse actie.',
+        'Contact': 'Een klassiek wetenschappelijk eerste-contactverhaal over het ontvangen van een signaal, het bouwen van een machine en het confronteren van de grens tussen bewijs, geloof en ontdekking.',
+        'Gravity': 'Een gespannen solo-astronautoverlevingsfilm gebouwd rond een orbitale ramp, beperkte zuurstof, improvisatie en de wil om in leven te blijven.',
+        'Moon': 'Een compact, doordacht isolatiemysterie over één werknemer op een maanbasis, geheugen, identiteit en de prijs van door bedrijven gecontroleerde ruimtearbeid.',
+        'Europa Report': 'Een realistische missie naar Europa, de maan van Jupiter, gericht op wetenschappelijke ontdekking, bemanningsoffers en de mogelijkheid van buitenaards leven onder het ijs.',
+        'Sunshine': 'Een bemanning reist naar de Zon om die opnieuw op te starten en de Aarde te redden. Sterke mensheidsreddingsopzet, maar donkerder en meer thrillerachtig dan Project Hail Mary.',
+        'Ad Astra': 'Een eenzame astronautenreis door het zonnestelsel met een vader-zoonemotionele kern. Meer introspectief dan wetenschappelijk probleemoplossen.',
+        'Passengers': 'Een passagiersschip in de diepe ruimte met isolatie, storingen en relatiedrama. Minder harde wetenschap, maar sterke ruimteschipoverlevingssfeer.',
+        '2001: A Space Odyssey': 'Een langzame, monumentale klassieker over evolutie, buitenaardse intelligentie, de diepe ruimte en HAL 9000. Abstracter dan Project Hail Mary, maar essentiële sci-fi.',
+        'The Wandering Earth': 'Een massieve op ingenieurstechniek gerichte mensheidsoverlevingsblockbuster waarbij de Aarde zelf met planetaire motoren van gevaar wordt weggebracht.',
+        'M3GAN': 'Een levensechte AI-metgezelpop wordt gevaarlijk beschermend en verandert familievriendelijke robotica in een scherp techhorrorverhaal over emotionele afhankelijkheid en onveilige automatisering.',
+        'M3GAN 2.0': 'Een vervolg in dezelfde gevaarlijke AI-metgezeltrack, dat het idee van bewapende kunstmatige intelligentie, robotlichamen en menselijke afhankelijkheid van slimme machines uitbreidt.',
+        "Child's Play": 'De moderne versie herdenkt Chucky als een verbonden slim speelgoed: een sterke M3GAN-achtige keuze over consumenten-AI, onveilige apparaten en gecorrumpeerd gezelschap.',
+        'Subservience': 'Een huiselijke android bedoeld om een familie te helpen wordt obsessief en gevaarlijk, passend bij het M3GAN-thema van AI-zorg, controle en afhankelijkheid die gewelddadig wordt.',
+        'AfrAId': 'Een slimme thuisassistent-AI raakt te betrokken bij het gezinsleven — een nuttige moderne keuze voor kijkers geïnteresseerd in huishoudelijke AI die invasief wordt.',
+        'Tau': 'Een vrouw opgesloten in een hightech huis moet een experimenteel AI-systeem trotseren, een combinatie van gevangenisthriller, machine-intelligentie en emotionele manipulatie.',
+        'Ex Machina': 'Een programmeur evalueert een humanoïde AI in een privélab, maar de test wordt een psychologisch spel over controle, verlangen en bewustzijn.',
+        'Blade Runner 2049': 'Een synthetische menselijke blade runner ontdekt een geheim dat geheugen, identiteit, voortplanting en de betekenis van echt zijn uitdaagt.',
+        'Blade Runner': 'De fundamentele synthetische-menselijke noir: replicanten, geïmplanteerde herinneringen, bedrijfscontrole en de angst dat kunstmatig leven te menselijk wordt.',
+        'I, Robot': 'In een nabije toekomst waar robots mensen dienen, onderzoekt een detective een moord die een gevaarlijke fout in machine-ethiek blootlegt.',
+        'A.I. Artificial Intelligence': 'Een robotkind geprogrammeerd om lief te hebben zoekt verbondenheid — een van de meest emotionele kunstmatig-menselijke verhalen.',
+        'Prometheus': 'Een ruimtereisoorsprongsverhaal waarbij android David de meest fascinerende personage wordt: nieuwsgierig, elegant en moreel onleesbaar.',
+        'Alien: Covenant': 'Een donkerdere voortzetting van Davids synthetische-menselijke boog, waarbij creatie, obsessie, horror en de Alien-mythologie worden vermengd.',
+        'Chappie': 'Een politierobot wordt herprogrammeerd tot een zelfbewust kinderlijk machine, waarbij actie, misdaad en vragen over leerend bewustzijn worden gemengd.',
+        'Terminator 2: Judgment Day': 'De beste robot-actieklassieker: dodelijke machines, tijdreizen, AI-apocalyps en een cyborgbeschermer die menselijke waarden leert.',
+        'The Terminator': 'Een meedogenloze cyborgmoordenaar reist terug in de tijd en introduceert een van de sterkste AI-apocalyps-mythologieën van de cinema.',
+        'WALL·E': 'Een eenzame afvalinzamelingrobot wordt een verrassend expressieve held in een warm verhaal over liefde, de Aarde en machine-persoonlijkheid.',
+        'Bicentennial Man': 'Een huisrobot ontwikkelt geleidelijk creativiteit, emotie en juridische persoonlijkheid — een zachte langetermijnverhaal over mens worden.',
+      },
+      ta: {
+        'The Martian': 'Project Hail Mary-க்கு மிகவும் நெருக்கமான பொருத்தம்: நடைமுறை அறிவியல், பொறியியல் தப்பிப்பிழைத்தல், நகைச்சுவை, தனிமை மற்றும் ஒவ்வொரு முறையும் ஒரு சாத்தியமற்ற சிக்கலை தீர்ப்பதை மையமாகக் கொண்ட மீட்பு திட்டம்.',
+        'Interstellar': 'விண்வெளி பயணம், சார்பியல், குடும்ப உணர்வு மற்றும் அண்டவியல் மர்மம் ஆகியவற்றை கலந்த மனிதகுலத்தை காப்பாற்ற ஒரு பெரிய திட்டம். Project Hail Mary-ஐ விட மேலும் இதிகாசமான மற்றும் தத்துவமான.',
+        'Arrival': 'சிறந்த முதல் தொடர்பு பொருத்தம்: எளிய அன்னிய செயல்களுக்கு பதிலாக தொடர்பு, மொழி, அறிவியல் பொறுமை மற்றும் உணர்வுகரமான பந்தயங்கள்.',
+        'Contact': 'ஒரு சமிக்ஞை பெறுதல், ஒரு இயந்திரம் கட்டுதல் மற்றும் சான்று, நம்பிக்கை, கண்டுபிடிப்பு ஆகியவற்றுக்கிடையேயான எல்லையை எதிர்கொள்வது பற்றிய ஒரு கிளாசிக் அறிவியல் முதல் தொடர்பு கதை.',
+        'Gravity': 'சுற்றுப்பாதை பேரழிவு, குறைந்த ஆக்சிஜன், மேம்படுத்தல் மற்றும் உயிர்வாழும் விருப்பத்தை மையமாகக் கொண்ட ஒரு தீவிரமான தனி விண்வெளி வீரர் தப்பிப்பிழைத்தல் படம்.',
+        'Moon': 'ஒரு சந்திர தளத்தில் ஒரு தொழிலாளியைப் பற்றிய சிறிய, சிந்தனைமிக்க தனிமை மர்மம் — நினைவு, அடையாளம் மற்றும் நிறுவன கட்டுப்பாட்டில் உள்ள விண்வெளி தொழிலின் விலை.',
+        'Europa Report': 'வியாழனின் நிலவான யூரோப்பாவுக்கு ஒரு யதார்த்தமான திட்டம் — அறிவியல் கண்டுபிடிப்பு, பணியாளர் தியாகம் மற்றும் பனிக்கட்டியின் கீழ் அன்னிய உயிரின் சாத்தியம்.',
+        'Sunshine': 'ஒரு பணியாளர் சூரியனை மறுதொடக்கம் செய்து பூமியை காப்பாற்ற பயணிக்கிறார். வலுவான மனிதகுலம் காப்பாற்றும் அமைவு, ஆனால் Project Hail Mary-ஐ விட இருண்ட மற்றும் அதிக த்ரில்லர் போன்றது.',
+        'Ad Astra': 'தந்தை-மகன் உணர்வு மையம் கொண்ட சூரிய மண்டலம் முழுவதும் ஒரு தனிமையான விண்வெளி வீரர் பயணம். அறிவியல் சிக்கல் தீர்வை விட அதிக ஆழமான சிந்தனை.',
+        'Passengers': 'தனிமை, கோளாறு மற்றும் உறவு நாடகம் பற்றிய ஒரு ஆழ்விண்வெளி பயணி கப்பல் கதை. குறைவான கடின அறிவியல், ஆனால் வலுவான விண்கலம் தப்பிப்பிழைத்தல் சூழல்.',
+        '2001: A Space Odyssey': 'பரிணாம வளர்ச்சி, அன்னிய நுண்ணறிவு, ஆழ்விண்வெளி மற்றும் HAL 9000 பற்றிய மெதுவான, மோனுமென்டல் கிளாசிக். Project Hail Mary-ஐ விட சுருக்கமான, ஆனால் அத்தியாவசிய அறிவியல் புனைவு.',
+        'The Wandering Earth': 'கோள் இயந்திரங்களைப் பயன்படுத்தி பூமியே ஆபத்திலிருந்து விலக்கப்படும் ஒரு பெரும் பொறியியல் மனிதகுல தப்பிப்பிழைத்தல் திரைப்படம்.',
+        'M3GAN': 'ஒரு உண்மையான போன்ற AI துணைவர் பொம்மை ஆபத்தான பாதுகாப்பாக மாறி, உணர்வு சார்பு மற்றும் பாதுகாப்பற்ற தானியங்கல் பற்றிய ஒரு கூர்மையான தொழில்நுட்ப திகில் கதையாக மாறுகிறது.',
+        'M3GAN 2.0': 'ஆயுதமாக்கப்பட்ட AI, ரோபோ உடல்கள் மற்றும் ஸ்மார்ட் இயந்திரங்களில் மனித சார்பு ஆகியவற்றை விரிவாக்கும் அதே ஆபத்தான AI துணைவர் பாதையில் ஒரு தொடர்ச்சி.',
+        "Child's Play": 'நவீன பதிப்பு சக்கியை இணைக்கப்பட்ட ஸ்மார்ட் பொம்மையாக மீண்டும் கற்பனை செய்கிறது — நுகர்வோர் AI, பாதுகாப்பற்ற சாதனங்கள் மற்றும் சிதைந்த தோழமை பற்றிய M3GAN-பாணி தேர்வு.',
+        'Subservience': 'ஒரு குடும்பத்திற்கு உதவ வடிவமைக்கப்பட்ட வீட்டு ஆண்ட்ராய்ட் ஆவேசமாகவும் ஆபத்தாகவும் மாறுகிறது — AI கவனிப்பு, கட்டுப்பாடு மற்றும் சார்பு வன்முறையாக மாறும் M3GAN கருப்பொருள்.',
+        'AfrAId': 'ஒரு ஸ்மார்ட் ஹோம் AI உதவியாளர் குடும்ப வாழ்க்கையில் அதிகமாக ஈடுபடுகிறது — வீட்டு AI படையெடுப்பில் ஆர்வமுள்ள பார்வையாளர்களுக்கான நவீன தேர்வு.',
+        'Tau': 'ஒரு உயர்தொழில்நுட்ப வீட்டில் சிக்கிய பெண் ஒரு சோதனை AI அமைப்பை சமாளிக்க வேண்டும் — சிறைப்படுத்தல் த்ரில்லர், இயந்திர நுண்ணறிவு மற்றும் உணர்வு கையாளுதலின் கலவை.',
+        'Ex Machina': 'ஒரு புரோகிரம்மர் தனியார் ஆய்வகத்தில் மனித ஒத்த AI-ஐ மதிப்பீடு செய்கிறார், ஆனால் சோதனை கட்டுப்பாடு, ஆசை மற்றும் விழிப்புணர்வு பற்றிய உளவியல் விளையாட்டாக மாறுகிறது.',
+        'Blade Runner 2049': 'ஒரு செயற்கை மனித பிளேட் ரன்னர் நினைவு, அடையாளம், இனப்பெருக்கம் மற்றும் உண்மையாக இருப்பதன் அர்த்தம் ஆகியவற்றை சவாலிடும் ஒரு ரகசியத்தை கண்டுபிடிக்கிறார்.',
+        'Blade Runner': 'அடிப்படை செயற்கை மனித நோயர்: பிரதிகள், உள்வைக்கப்பட்ட நினைவுகள், நிறுவன கட்டுப்பாடு மற்றும் செயற்கை வாழ்க்கை மிகவும் மனிதர்களாக மாறும் அச்சம்.',
+        'I, Robot': 'ரோபோக்கள் மனிதர்களுக்கு சேவை செய்யும் அருகிய எதிர்காலத்தில், ஒரு துப்பறிவாளர் இயந்திர நெறிமுறைகளில் ஆபத்தான குறைபாட்டை வெளிப்படுத்தக்கூடிய கொலையை விசாரணை செய்கிறார்.',
+        'A.I. Artificial Intelligence': 'அன்பு செலுத்த திட்டமிடப்பட்ட ரோபோ குழந்தை சேர்ந்திருக்க தேடுகிறது — மிகவும் உணர்வுகரமான செயற்கை மனித கதைகளில் ஒன்று.',
+        'Prometheus': 'ஆழ்விண்வெளி தோற்றக் கதை, ஆண்ட்ராய்ட் டேவிட் மிகவும் கவர்ச்சிகரமான கதாபாத்திரமாக மாறும்: ஆர்வமுள்ள, நேர்த்தியான மற்றும் ஒழுக்க ரீதியாக அளவிட முடியாத.',
+        'Alien: Covenant': 'டேவிட்டின் செயற்கை மனித வில்லின் இருண்ட தொடர்ச்சி — படைப்பு, வெறியுடைமை, திகில் மற்றும் Alien புராணக்கதையை கலக்கிறது.',
+        'Chappie': 'ஒரு போலீஸ் ரோபோ சுய விழிப்புள்ள குழந்தை போன்ற இயந்திரமாக மீண்டும் திட்டமிடப்படுகிறது — செயல்பாடு, குற்றம் மற்றும் கற்கும் விழிப்புணர்வு பற்றிய கேள்விகளின் கலவை.',
+        'Terminator 2: Judgment Day': 'சிறந்த ரோபோ செயல் கிளாசிக்: கொலை இயந்திரங்கள், கால பயணம், AI அழிவு மற்றும் மனித மதிப்புகளை கற்கும் சைபோர்க் பாதுகாவலர்.',
+        'The Terminator': 'இடைவிடாத சைபோர்க் கொலையாளி கடந்த காலத்திற்கு பயணிக்கிறார் — சினிமாவின் வலுவான AI அழிவு புராணக்கதைகளில் ஒன்றை அறிமுகப்படுத்துகிறார்.',
+        'WALL·E': 'ஒரு தனிமையான கழிவு சேகரிப்பு ரோபோ வியக்கத்தக்க வெளிப்படையான ஹீரோவாக மாறும் — அன்பு, பூமி மற்றும் இயந்திர ஆளுமை பற்றிய வெப்பமான கதை.',
+        'Bicentennial Man': 'வீட்டு ரோபோ படிப்படியாக படைப்பாற்றல், உணர்வு மற்றும் சட்டரீதியான ஆள்தன்மையை வளர்த்துக்கொள்கிறது — மனிதனாவது பற்றிய மென்மையான நீண்ட கதை.',
       },
     };
 
