@@ -1,0 +1,15 @@
+# PDFs / source material
+*.pdf
+
+# Jupyter notebooks
+*.ipynb
+
+# IDE
+.idea/
+.vscode/
+
+# Misc intermediate files
+basic-qa
+
+# Claude project files
+.claude/
