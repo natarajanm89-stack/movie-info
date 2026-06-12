@@ -1,0 +1,1750 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LLM Foundations — CPD Session 01</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:ital,wght@0,400;0,600;1,400&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:       #05080f;
+      --bg1:      #080d18;
+      --bg2:      #0d1525;
+      --bg3:      rgba(255,255,255,.06);
+      --line:     rgba(255,255,255,.1);
+      --line2:    rgba(255,255,255,.18);
+      --text:     #eef2ff;
+      --muted:    #8898bb;
+      --dim:      #4e5f80;
+      --cyan:     #00e5ff;
+      --violet:   #7c5cff;
+      --pink:     #ff4e9b;
+      --amber:    #ffbe3d;
+      --green:    #3dffa0;
+      --red:      #ff5a5a;
+      --r:        20px;
+      --rlg:      28px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'DM Sans', ui-sans-serif, system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      overflow-x: hidden;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    /* ── PROGRESS BAR ── */
+    #progress-bar {
+      position: fixed;
+      top: 0; left: 0;
+      height: 3px;
+      width: 0%;
+      background: linear-gradient(90deg, var(--violet), var(--cyan));
+      z-index: 200;
+      transition: width .15s linear;
+    }
+
+    /* ── FLOATING ORBS ── */
+    .orb {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 0;
+      filter: blur(80px);
+      opacity: .18;
+      animation: drift 20s ease-in-out infinite;
+    }
+    .orb-1 { width: 600px; height: 600px; background: var(--violet); top: -100px; left: -150px; animation-duration: 22s; }
+    .orb-2 { width: 500px; height: 500px; background: var(--cyan);   top: 40%; right: -100px; animation-duration: 28s; animation-delay: -8s; }
+    .orb-3 { width: 400px; height: 400px; background: var(--pink);   bottom: 10%; left: 20%;  animation-duration: 18s; animation-delay: -4s; }
+    @keyframes drift {
+      0%,100% { transform: translate(0,0) scale(1); }
+      33%      { transform: translate(30px,-40px) scale(1.05); }
+      66%      { transform: translate(-20px,30px) scale(.96); }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 14px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 100;
+      display: flex;
+      gap: 2px;
+      padding: 6px;
+      border: 1px solid var(--line2);
+      border-radius: 999px;
+      background: rgba(5,8,15,.82);
+      backdrop-filter: blur(24px);
+      box-shadow: 0 8px 40px rgba(0,0,0,.5);
+      max-width: calc(100vw - 24px);
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    nav::-webkit-scrollbar { display: none; }
+    nav a {
+      white-space: nowrap;
+      text-decoration: none;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .02em;
+      padding: 6px 11px;
+      border-radius: 999px;
+      transition: .2s;
+    }
+    nav a:hover, nav a.active { color: var(--text); background: rgba(255,255,255,.12); }
+
+    /* ── LAYOUT ── */
+    section {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 100px 6vw 60px;
+      position: relative;
+      z-index: 1;
+    }
+    .slide {
+      width: min(1200px, 100%);
+      background: linear-gradient(145deg, rgba(255,255,255,.075), rgba(255,255,255,.03));
+      border: 1px solid var(--line2);
+      border-radius: var(--rlg);
+      backdrop-filter: blur(20px);
+      box-shadow: 0 30px 100px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.12);
+      padding: clamp(28px,5vw,64px);
+      position: relative;
+      overflow: hidden;
+    }
+    .slide::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse at 90% -10%, rgba(124,92,255,.15), transparent 55%);
+      pointer-events: none;
+    }
+
+    /* ── ENTRANCE ── */
+    .appear {
+      opacity: 0;
+      transform: translateY(40px) scale(.975);
+      filter: blur(4px);
+      transition: opacity .9s cubic-bezier(.2,.8,.2,1),
+                  transform .9s cubic-bezier(.2,.8,.2,1),
+                  filter .9s cubic-bezier(.2,.8,.2,1);
+    }
+    .appear.visible {
+      opacity: 1;
+      transform: none;
+      filter: blur(0);
+    }
+
+    /* ── TYPOGRAPHY ── */
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 18px;
+    }
+    .eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 24px;
+      height: 2px;
+      background: var(--cyan);
+      border-radius: 1px;
+    }
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(42px,7vw,90px);
+      font-weight: 800;
+      letter-spacing: -.04em;
+      line-height: 1.0;
+      margin-bottom: 22px;
+    }
+    h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(30px,4.5vw,60px);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      line-height: 1.05;
+      margin-bottom: 18px;
+    }
+    h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(18px,2vw,24px);
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+    p { color: var(--muted); font-size: clamp(15px,1.4vw,19px); line-height: 1.7; max-width: 880px; }
+    .lead { font-size: clamp(20px,2vw,28px); color: #c8d4ff; font-weight: 300; max-width: 860px; }
+    code {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: .88em;
+      background: rgba(0,229,255,.1);
+      border: 1px solid rgba(0,229,255,.22);
+      color: var(--cyan);
+      padding: 2px 7px;
+      border-radius: 6px;
+    }
+
+    /* ── GRIDS ── */
+    .g2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 18px; margin-top: 28px; }
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-top: 28px; }
+    .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-top: 28px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--bg3);
+      border: 1px solid var(--line);
+      border-radius: var(--r);
+      padding: 22px;
+      transition: border-color .25s, transform .25s, box-shadow .25s;
+    }
+    .card:hover {
+      border-color: var(--line2);
+      transform: translateY(-3px);
+      box-shadow: 0 12px 40px rgba(0,0,0,.3);
+    }
+    .card p { font-size: 15px; }
+
+    /* ── HIGHLIGHT BOX ── */
+    .note {
+      margin-top: 20px;
+      padding: 16px 20px;
+      border-left: 3px solid var(--cyan);
+      background: rgba(0,229,255,.07);
+      border-radius: 0 14px 14px 0;
+      color: #cce8ff;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .warn {
+      margin-top: 20px;
+      padding: 16px 20px;
+      border-left: 3px solid var(--amber);
+      background: rgba(255,190,61,.07);
+      border-radius: 0 14px 14px 0;
+      color: #ffe8b0;
+      font-size: 15px;
+      line-height: 1.7;
+    }
+    .presenter {
+      margin-top: 22px;
+      padding: 16px 20px;
+      border-radius: 14px;
+      background: rgba(255,190,61,.07);
+      border: 1px solid rgba(255,190,61,.2);
+      color: #ffe7b8;
+      font-size: 14px;
+    }
+    .presenter strong { color: #fff; }
+
+    /* ── STEPPER ── */
+    .stepper { margin-top: 24px; display: grid; gap: 12px; counter-reset: step; }
+    .step {
+      counter-increment: step;
+      display: grid;
+      grid-template-columns: 44px 1fr;
+      gap: 14px;
+      align-items: start;
+      padding: 16px;
+      border: 1px solid var(--line);
+      background: var(--bg3);
+      border-radius: 16px;
+      transition: border-color .2s;
+    }
+    .step:hover { border-color: rgba(124,92,255,.4); }
+    .step::before {
+      content: counter(step);
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-family: 'Syne', sans-serif;
+      font-size: 15px;
+      background: linear-gradient(135deg, var(--violet), var(--cyan));
+      color: #fff;
+    }
+    .step-body { font-size: 15px; color: var(--muted); }
+    .step-body strong { color: #fff; display: block; margin-bottom: 4px; }
+
+    /* ── CODE BLOCK ── */
+    .codeblock {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      background: rgba(0,0,0,.4);
+      border: 1px solid var(--line2);
+      border-radius: 14px;
+      padding: 18px 20px;
+      overflow-x: auto;
+      margin-top: 14px;
+      white-space: pre;
+      color: #c9d8ff;
+    }
+    .codeblock .kw   { color: var(--violet); }
+    .codeblock .str  { color: var(--green); }
+    .codeblock .key  { color: var(--cyan); }
+    .codeblock .val  { color: var(--amber); }
+    .codeblock .cm   { color: var(--dim); font-style: italic; }
+    .codeblock .fn   { color: #ff9de2; }
+
+    /* ── TOKEN DEMO ── */
+    .demo-box {
+      margin-top: 26px;
+      padding: 22px;
+      border-radius: 20px;
+      background: rgba(0,0,0,.3);
+      border: 1px solid var(--line);
+    }
+    .demo-input {
+      width: 100%;
+      min-height: 76px;
+      resize: vertical;
+      color: #e8f0ff;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line2);
+      border-radius: 12px;
+      padding: 14px 16px;
+      font-size: 14px;
+      font-family: 'IBM Plex Mono', monospace;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .demo-input:focus { border-color: var(--violet); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 12px;
+      border: 0;
+      border-radius: 999px;
+      padding: 11px 20px;
+      font-weight: 700;
+      font-size: 14px;
+      color: #07101a;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+      text-decoration: none;
+    }
+    .btn:hover { opacity: .88; transform: scale(.98); }
+    .btn-ghost {
+      background: var(--bg3);
+      color: var(--text);
+      border: 1px solid var(--line2);
+    }
+    .btn-ghost:hover { color: var(--text); }
+    .token-wrap { margin-top: 16px; display: flex; flex-wrap: wrap; gap: 8px; min-height: 36px; }
+    .tok {
+      padding: 7px 11px;
+      border-radius: 10px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      animation: pop .3s ease both;
+      position: relative;
+      cursor: default;
+    }
+    .tok:hover .tok-tip { opacity: 1; transform: translateY(-4px); }
+    .tok-tip {
+      position: absolute;
+      bottom: calc(100% + 6px);
+      left: 50%;
+      transform: translateX(-50%) translateY(0);
+      background: rgba(5,8,15,.95);
+      border: 1px solid var(--line2);
+      border-radius: 8px;
+      padding: 5px 10px;
+      font-size: 11px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity .2s, transform .2s;
+      z-index: 10;
+    }
+    .tok-word  { background: rgba(0,229,255,.15); border: 1px solid rgba(0,229,255,.35); color: var(--cyan); }
+    .tok-sub   { background: rgba(124,92,255,.18); border: 1px solid rgba(124,92,255,.4); color: #c8b4ff; }
+    .tok-punct { background: rgba(255,190,61,.15); border: 1px solid rgba(255,190,61,.35); color: var(--amber); }
+    .tok-num   { background: rgba(61,255,160,.12); border: 1px solid rgba(61,255,160,.3); color: var(--green); }
+    .tok-sym   { background: rgba(255,90,90,.12); border: 1px solid rgba(255,90,90,.3); color: var(--red); }
+    .tok-stats { margin-top: 12px; font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); display: flex; gap: 20px; }
+    .tok-stats span { color: #fff; font-weight: 700; }
+
+    /* ── EMBEDDING MAP ── */
+    #embed-canvas { width: 100%; border-radius: 18px; display: block; margin-top: 22px; cursor: crosshair; }
+
+    /* ── ATTENTION HEATMAP ── */
+    .attn-wrap { margin-top: 26px; overflow-x: auto; }
+    .attn-table { border-collapse: separate; border-spacing: 4px; margin: 0 auto; }
+    .attn-table th {
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 400;
+      padding: 6px 8px;
+      text-align: center;
+    }
+    .attn-table td {
+      width: 52px; height: 36px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 11px;
+      font-family: 'IBM Plex Mono', monospace;
+      transition: transform .15s;
+      cursor: default;
+    }
+    .attn-table td:hover { transform: scale(1.12); z-index: 2; position: relative; }
+    .attn-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    .attn-btn {
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      border: 1px solid var(--line2);
+      background: var(--bg3);
+      color: var(--muted);
+      cursor: pointer;
+      transition: .2s;
+    }
+    .attn-btn.on, .attn-btn:hover { background: rgba(124,92,255,.2); color: var(--text); border-color: rgba(124,92,255,.5); }
+
+    /* ── TRANSFORMER DIAGRAM ── */
+    #transformer-canvas { width: 100%; border-radius: 18px; display: block; margin-top: 22px; }
+
+    /* ── LOSS CURVE ── */
+    #loss-canvas { width: 100%; border-radius: 18px; display: block; margin-top: 22px; }
+
+    /* ── GENERATION ── */
+    .gen-output {
+      min-height: 80px;
+      font-size: clamp(20px,2.2vw,34px);
+      font-family: 'Syne', sans-serif;
+      line-height: 1.5;
+      color: #fff;
+      margin-top: 16px;
+    }
+    .cursor { display: inline-block; width: 9px; height: 1em; background: var(--cyan); vertical-align: -4px; animation: blink .7s infinite; margin-left: 2px; }
+    .prob-bars { margin-top: 16px; display: grid; gap: 10px; }
+    .prob-row { display: grid; grid-template-columns: 110px 1fr 54px; gap: 10px; align-items: center; font-size: 13px; }
+    .prob-row span:first-child { font-family: 'IBM Plex Mono', monospace; color: var(--muted); }
+    .prob-track { height: 14px; background: rgba(255,255,255,.06); border-radius: 999px; overflow: hidden; }
+    .prob-fill { height: 100%; border-radius: 999px; background: linear-gradient(90deg, var(--violet), var(--cyan)); transition: width .4s cubic-bezier(.4,0,.2,1); }
+    .prob-val { font-family: 'IBM Plex Mono', monospace; font-size: 12px; color: var(--muted); text-align: right; }
+
+    /* ── FLOW STRIP ── */
+    .flow { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 28px; font-size: clamp(16px,1.8vw,24px); }
+    .flow-step { padding: 12px 18px; border-radius: 14px; background: var(--bg3); border: 1px solid var(--line2); font-weight: 600; font-family: 'Syne', sans-serif; transition: border-color .2s; }
+    .flow-step:hover { border-color: rgba(0,229,255,.5); }
+    .flow-arrow { color: var(--cyan); font-size: 22px; font-weight: 900; }
+
+    /* ── TIMELINE ── */
+    .timeline { margin-top: 32px; position: relative; display: grid; gap: 14px; padding-left: 6px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 98px; top: 14px; bottom: 14px;
+      width: 2px;
+      background: linear-gradient(var(--violet), var(--cyan), var(--amber));
+      opacity: .6;
+    }
+    .event { display: grid; grid-template-columns: 112px 1fr; gap: 22px; align-items: start; }
+    .year { color: var(--amber); font-weight: 800; font-family: 'Syne', sans-serif; font-size: 18px; text-align: right; padding-top: 12px; position: relative; }
+    .year::after { content: ''; position: absolute; right: -28px; top: 20px; width: 10px; height: 10px; border-radius: 50%; background: var(--amber); box-shadow: 0 0 0 3px rgba(255,190,61,.25); }
+    .event-body {
+      background: var(--bg3);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 14px 18px;
+      transition: border-color .2s, transform .2s;
+    }
+    .event-body:hover { border-color: var(--line2); transform: translateX(4px); }
+    .event-body b { color: #fff; display: block; margin-bottom: 4px; }
+    .event-body small { color: var(--muted); font-size: 13px; }
+
+    /* ── CHAT FORMAT ── */
+    .chat-thread { margin-top: 22px; display: grid; gap: 10px; }
+    .chat-bubble {
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-size: 14px;
+      line-height: 1.65;
+      font-family: 'IBM Plex Mono', monospace;
+      border: 1px solid transparent;
+    }
+    .bubble-system  { background: rgba(255,90,90,.1); border-color: rgba(255,90,90,.25); color: #ffcaca; }
+    .bubble-user    { background: rgba(124,92,255,.12); border-color: rgba(124,92,255,.3); color: #d4c8ff; }
+    .bubble-asst    { background: rgba(61,255,160,.08); border-color: rgba(61,255,160,.25); color: #c0ffe0; }
+    .bubble-label   { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .7; display: block; margin-bottom: 6px; }
+
+    /* ── RAG PIPELINE ── */
+    .rag-flow { margin-top: 26px; display: grid; gap: 0; }
+    .rag-step {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 16px;
+      align-items: stretch;
+      position: relative;
+    }
+    .rag-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 23px; top: 48px;
+      width: 2px; height: calc(100% - 32px);
+      background: linear-gradient(var(--cyan), var(--violet));
+      opacity: .5;
+    }
+    .rag-num {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-family: 'Syne', sans-serif;
+      font-size: 16px;
+      color: #07101a;
+      background: linear-gradient(135deg, var(--cyan), var(--violet));
+      flex-shrink: 0;
+      margin-bottom: 24px;
+    }
+    .rag-content {
+      background: var(--bg3);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 14px 18px;
+      margin-bottom: 14px;
+      transition: border-color .2s;
+    }
+    .rag-content:hover { border-color: rgba(0,229,255,.35); }
+    .rag-content b { color: #fff; display: block; margin-bottom: 4px; font-size: 15px; }
+    .rag-content small { color: var(--muted); font-size: 13px; }
+
+    /* ── TOOL USE ── */
+    .tool-flow { margin-top: 24px; display: grid; gap: 0; }
+    .tool-msg {
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-family: 'IBM Plex Mono', monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      margin-bottom: 8px;
+      border: 1px solid transparent;
+    }
+    .tool-llm   { background: rgba(124,92,255,.12); border-color: rgba(124,92,255,.3); color: #d4c8ff; }
+    .tool-call  { background: rgba(255,190,61,.1);  border-color: rgba(255,190,61,.3);  color: #ffe8b0; }
+    .tool-result{ background: rgba(61,255,160,.08); border-color: rgba(61,255,160,.3);  color: #b8ffe0; }
+    .tool-label { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; opacity: .6; display: block; margin-bottom: 5px; }
+    .tool-arrow-row { display: flex; align-items: center; justify-content: center; padding: 4px 0; color: var(--dim); font-size: 18px; margin-bottom: 4px; }
+
+    /* ── COMPARE ── */
+    .compare { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 26px; }
+    .compare-bad  { border-left: 3px solid var(--red);   background: rgba(255,90,90,.06); }
+    .compare-good { border-left: 3px solid var(--green);  background: rgba(61,255,160,.06); }
+
+    /* ── PIPELINE (2 col) ── */
+    .pipeline { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 26px; align-items: start; }
+    .machine {
+      background: rgba(0,0,0,.25);
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+    }
+    .machine .stage {
+      padding: 12px 16px;
+      margin: 10px 0;
+      border-radius: 12px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--line);
+      font-size: 14px;
+      color: var(--muted);
+      transition: border-color .2s;
+    }
+    .machine .stage:hover { border-color: rgba(124,92,255,.4); color: var(--text); }
+    .machine .stage strong { color: #fff; }
+
+    /* ── TEMP SCALE ── */
+    .temp-scale { margin-top: 22px; display: grid; gap: 16px; }
+    .scale-row { display: grid; grid-template-columns: 100px 1fr 160px; gap: 14px; align-items: center; }
+    .scale-track { height: 12px; border-radius: 999px; background: linear-gradient(90deg, var(--green), var(--amber), var(--red)); position: relative; }
+    .knob { position: absolute; top: 50%; width: 22px; height: 22px; border-radius: 50%; background: #fff; transform: translate(-50%,-50%); box-shadow: 0 2px 14px rgba(0,0,0,.5); }
+    .scale-label { font-size: 13px; color: var(--muted); }
+
+    /* ── MATURITY CHIPS ── */
+    .stage-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    .chip { padding: 6px 14px; border-radius: 999px; font-size: 12px; font-weight: 600; border: 1px solid transparent; }
+    .chip-done  { background: rgba(61,255,160,.1);  color: var(--green);  border-color: rgba(61,255,160,.3); }
+    .chip-now   { background: rgba(255,190,61,.1);  color: var(--amber);  border-color: rgba(255,190,61,.3); animation: pulse 2s infinite; }
+    .chip-next  { background: rgba(0,229,255,.1);   color: var(--cyan);   border-color: rgba(0,229,255,.3); }
+    .chip-later { background: var(--bg3); color: var(--dim); border-color: var(--line); }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.6} }
+
+    /* ── QUESTION CARD ── */
+    .qgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-top: 24px; }
+    .qcard {
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.2);
+      background: rgba(255,255,255,.04);
+    }
+    .qcard b { color: var(--amber); }
+    .qcard p { font-size: 14px; margin-top: 8px; }
+
+    /* ── PLAYBOOK ── */
+    .playbook-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 28px; }
+    .pb-card {
+      background: var(--bg3);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 20px;
+      transition: border-color .25s, transform .25s;
+    }
+    .pb-card:hover { border-color: rgba(124,92,255,.4); transform: translateY(-3px); }
+    .pb-tag {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+      font-family: 'IBM Plex Mono', monospace;
+      margin-bottom: 10px;
+    }
+
+    /* ── BIG NUMBER ── */
+    .big-num { font-family: 'Syne', sans-serif; font-size: clamp(40px,6vw,80px); font-weight: 800; letter-spacing: -.04em; color: #fff; }
+
+    /* ── FOOTER ── */
+    footer { padding: 40px 6vw 80px; color: var(--dim); font-size: 13px; z-index: 1; position: relative; }
+    footer a { color: var(--cyan); }
+
+    /* ── MATH GRID ── */
+    .math-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 12px; margin-top: 22px; }
+    .math-tile { padding: 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--bg3); text-align: center; }
+    .math-tile strong { color: #fff; display: block; font-size: 13px; margin-bottom: 6px; }
+    .math-tile span { font-size: 12px; color: var(--muted); }
+
+    @keyframes pop  { from { transform: translateY(10px) scale(.9); opacity: 0; } to { transform: none; opacity: 1; } }
+    @keyframes blink { 50% { opacity: 0; } }
+    @keyframes growX { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+    @media (max-width: 860px) {
+      nav { display: none; }
+      section { padding: 60px 16px 40px; }
+      .g2,.g3,.g4,.pipeline,.compare,.qgrid,.playbook-grid,.scale-row,.math-grid { grid-template-columns: 1fr; }
+      .timeline::before { left: 68px; }
+      .event { grid-template-columns: 84px 1fr; gap: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+<div class="orb orb-3"></div>
+
+<nav id="main-nav">
+  <a href="#hero">Intro</a>
+  <a href="#objectives">Goals</a>
+  <a href="#evolution">AI Tree</a>
+  <a href="#history">History</a>
+  <a href="#tokens">Tokens</a>
+  <a href="#embeddings">Embeddings</a>
+  <a href="#nn">Neural Nets</a>
+  <a href="#training">Training</a>
+  <a href="#rnn">Pre-Transformer</a>
+  <a href="#attention">Attention</a>
+  <a href="#transformer">Architecture</a>
+  <a href="#generate">Generation</a>
+  <a href="#system-prompt">System Prompts</a>
+  <a href="#rag">RAG</a>
+  <a href="#tools">Tool Use</a>
+  <a href="#temperature">Sampling</a>
+  <a href="#capacity">Capacity</a>
+  <a href="#limits">Limits</a>
+  <a href="#playbook">Playbook</a>
+  <a href="#close">Close</a>
+</nav>
+
+<!-- ═══════════════════════════════════════ HERO ═══════════════════════════════════════ -->
+<section id="hero">
+  <div class="slide appear">
+    <div class="eyebrow">CPD Session 01 · LLM Foundations</div>
+    <h1>What is<br>an LLM?</h1>
+    <p class="lead">A practical, interactive introduction to how Large Language Models represent language, predict tokens, and power modern AI systems — built for engineers.</p>
+    <p style="margin-top:14px">This session gives the team a correct mental model of what happens between a user prompt and a generated answer. No magic, no vagueness — just tokens, vectors, neural networks, and probabilities.</p>
+    <div class="flow" id="hero-flow">
+      <div class="flow-step" style="opacity:0;transition:opacity .5s .2s,transform .5s .2s;transform:translateY(20px)">Text</div>
+      <div class="flow-arrow" style="opacity:0;transition:opacity .5s .35s">→</div>
+      <div class="flow-step" style="opacity:0;transition:opacity .5s .5s,transform .5s .5s;transform:translateY(20px)">Tokens</div>
+      <div class="flow-arrow" style="opacity:0;transition:opacity .5s .65s">→</div>
+      <div class="flow-step" style="opacity:0;transition:opacity .5s .8s,transform .5s .8s;transform:translateY(20px)">Vectors</div>
+      <div class="flow-arrow" style="opacity:0;transition:opacity .5s .95s">→</div>
+      <div class="flow-step" style="opacity:0;transition:opacity .5s 1.1s,transform .5s 1.1s;transform:translateY(20px)">Transformer</div>
+      <div class="flow-arrow" style="opacity:0;transition:opacity .5s 1.25s">→</div>
+      <div class="flow-step" style="opacity:0;transition:opacity .5s 1.4s,transform .5s 1.4s;transform:translateY(20px);background:rgba(0,229,255,.15);border-color:rgba(0,229,255,.5)">Next Token</div>
+    </div>
+    <div class="presenter" style="margin-top:28px"><strong>Presenter opening:</strong> "Today we demystify LLMs. We will not treat them as magic. We'll go from raw text all the way through attention, token prediction, and practical usage patterns — with live demos."</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ OBJECTIVES ═══════════════════════════════════ -->
+<section id="objectives">
+  <div class="slide appear">
+    <div class="eyebrow">Session Promise</div>
+    <h2>What you should understand by the end</h2>
+    <div class="g2">
+      <div class="card"><h3>Conceptual clarity</h3><p>What an LLM is, how it differs from older NLP and search systems, and why Transformers changed everything.</p></div>
+      <div class="card"><h3>Internal flow</h3><p>Text → tokens → embeddings → Transformer blocks → probability distribution → generated token.</p></div>
+      <div class="card"><h3>Practical engineering</h3><p>System prompts, RAG, tool calling, prompt patterns — how to use LLMs effectively in your services.</p></div>
+      <div class="card"><h3>Healthy scepticism</h3><p>Why hallucination, stale knowledge, context limits, and prompt injection must be handled with validation.</p></div>
+    </div>
+    <div class="qgrid">
+      <div class="qcard"><b>Ask the room:</b><p>When you press Enter in ChatGPT, what do you think happens internally before you see the first word?</p></div>
+      <div class="qcard"><b>Expected answers:</b><p>Most imagine search or database lookup. The real answer: next-token prediction over a learned probabilistic model of language.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ AI TREE ═════════════════════════════════════ -->
+<section id="evolution">
+  <div class="slide appear">
+    <div class="eyebrow">Big Picture</div>
+    <h2>AI → ML → Deep Learning → GenAI → LLM</h2>
+    <p class="lead">LLMs are not a separate universe. They sit inside the broader AI family tree.</p>
+    <div class="g3">
+      <div class="card"><h3>AI</h3><p>Machines performing tasks that seem intelligent: chess engines, route planners, fraud detection, conversational assistants.</p></div>
+      <div class="card"><h3>Machine Learning</h3><p>Systems learn patterns from examples rather than hand-coded rules. Give data, not instructions.</p></div>
+      <div class="card"><h3>Deep Learning</h3><p>Neural networks with many layers learn progressively complex representations of the input.</p></div>
+      <div class="card"><h3>Generative AI</h3><p>AI that creates new text, code, images, audio, or structured outputs — not just classifying.</p></div>
+      <div class="card"><h3>LLM</h3><p>A large neural language model trained on massive text/code to predict and generate useful language.</p></div>
+      <div class="card"><h3>Agent</h3><p>LLM + tools + memory + workflow control + approvals. The Rudhra platform you're building on.</p></div>
+    </div>
+    <div class="note"><strong>Key contrast:</strong> Traditional software says "give me exact rules." ML says "give me examples." LLMs say "give me language context — I'll generate the next useful token based on learned patterns across the internet."</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════ HISTORY ═══════════════════════════════════ -->
+<section id="history">
+  <div class="slide appear">
+    <div class="eyebrow">Recent History of Language AI</div>
+    <h2>From word counts to frontier models</h2>
+    <p>Language AI has always had one hard problem: language is messy, contextual, and ambiguous. This history is a story of better <em>representations</em> — from counting words, to dense vectors, to attention, to instruction-following giants.</p>
+    <div class="timeline">
+      <div class="event"><div class="year">~2000</div><div class="event-body"><b>Bag-of-Words &amp; TF-IDF</b><small>Text as counts; simple, fast, but loses word order and deep semantics entirely.</small></div></div>
+      <div class="event"><div class="year">2013</div><div class="event-body"><b>Word2Vec</b><small>Words become dense vectors. Semantically similar words appear close in mathematical space. "King − Man + Woman ≈ Queen"</small></div></div>
+      <div class="event"><div class="year">2017</div><div class="event-body"><b>"Attention Is All You Need" — Transformer</b><small>Google's paper. Attention replaces recurrence as the core mechanism. Modern LLMs trace directly here.</small></div></div>
+      <div class="event"><div class="year">2018–20</div><div class="event-body"><b>BERT, GPT, GPT-2, GPT-3, T5</b><small>Encoder, decoder, and encoder-decoder models scale rapidly. GPT-3 (175B params) shocks the research community.</small></div></div>
+      <div class="event"><div class="year">2022</div><div class="event-body"><b>ChatGPT (GPT-3.5 + RLHF)</b><small>Instruction-following chat interface makes LLMs mainstream. 100M users in 2 months.</small></div></div>
+      <div class="event"><div class="year">2023–24</div><div class="event-body"><b>GPT-4, Claude 3.x, Gemini 1.x, Llama-2/3</b><small>Reasoning, coding, multimodal, and long-context (1M+ tokens) improve dramatically.</small></div></div>
+      <div class="event"><div class="year">2025+</div><div class="event-body"><b>GPT-5, Gemini 2.5/3, Claude 4.x, o-series</b><small>Frontier models push harder on agentic reasoning, native tool use, and code generation. Context windows exceed 1M tokens.</small></div></div>
+    </div>
+    <div class="presenter"><strong>Key insight:</strong> The big jump wasn't only bigger models. It was better representations, better architectures for handling context, and RLHF to teach models to follow human instructions.</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ TOKENIZATION ═════════════════════════════════ -->
+<section id="tokens">
+  <div class="slide appear">
+    <div class="eyebrow">From Text to Tokens</div>
+    <h2>LLMs do not read words — they read tokens</h2>
+    <p>Text is split into <strong>tokens</strong> before the model sees it. A token can be a whole word, a word fragment, a punctuation mark, a whitespace, a newline, or a code symbol. The same sentence takes different token counts depending on the language, tokenizer, and vocabulary.</p>
+    <div class="stepper">
+      <div class="step"><div class="step-body"><strong>Raw text (what you write)</strong><code>@RestController public void handleRequest()</code></div></div>
+      <div class="step"><div class="step-body"><strong>Tokenizer splits by subword</strong><code>@Rest | Controller | ▁public | ▁void | ▁handle | Request | ()</code></div></div>
+      <div class="step"><div class="step-body"><strong>Converted to integer IDs</strong><code>[5765, 10811, 1171, 3203, 5418, 2866, 368]</code> <span style="color:var(--dim);font-size:12px">— illustrative</span></div></div>
+    </div>
+    <div class="demo-box">
+      <div style="margin-bottom:10px;font-size:14px;font-weight:600">Try the tokenizer:</div>
+      <textarea id="tokenText" class="demo-input">@RestController public void handleRequest(HttpServletRequest req) throws Exception</textarea>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <button class="btn" onclick="tokenizeDemo()">Tokenize</button>
+        <a class="btn btn-ghost" href="https://platform.openai.com/tokenizer" target="_blank" rel="noreferrer">↗ Live OpenAI Tokenizer</a>
+      </div>
+      <div id="tokenOutput" class="token-wrap"></div>
+      <div id="tokenStats" class="tok-stats" style="display:none">
+        Chars: <span id="charCount">0</span> &nbsp;|&nbsp; Tokens: <span id="tokCount">0</span> &nbsp;|&nbsp; Ratio: <span id="tokRatio">—</span> chars/token
+      </div>
+    </div>
+    <div class="g3" style="margin-top:22px">
+      <div class="card"><h3 style="color:var(--cyan)">Word token</h3><p>Common English words often map 1:1. <code>void</code>, <code>class</code>, <code>true</code></p></div>
+      <div class="card"><h3 style="color:#c8b4ff">Subword token</h3><p>Long or rare words split into pieces. <code>@RestController</code> → 2+ tokens.</p></div>
+      <div class="card"><h3 style="color:var(--amber)">Punctuation / symbol</h3><p>Brackets, operators, newlines — each usually a token. Code is expensive.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ EMBEDDINGS ════════════════════════════════════ -->
+<section id="embeddings">
+  <div class="slide appear">
+    <div class="eyebrow">Meaning as Mathematics</div>
+    <h2>Embeddings: turning tokens into vectors of meaning</h2>
+    <p>An embedding maps a token, sentence, or document to a list of numbers. Semantically similar things cluster together in that high-dimensional space. This is why semantic search works — "NullPointerException in OrderService" and "null reference error in order module" are different strings but close vectors.</p>
+    <canvas id="embed-canvas" height="320"></canvas>
+    <div class="g3" style="margin-top:22px">
+      <div class="card"><h3>Token embedding</h3><p>Learned per-token vector inside the model. Updated during training to capture contextual meaning.</p></div>
+      <div class="card"><h3>Sentence embedding</h3><p>A single vector for a full sentence — useful for semantic search and classification.</p></div>
+      <div class="card"><h3>Document embedding</h3><p>Chunk-level vector for RAG. Lets you search Confluence, Jira, or code by meaning, not keywords.</p></div>
+    </div>
+    <div class="note"><strong>Engineering insight:</strong> Semantic search in your RAG pipeline uses embeddings under the hood. Two different wordings of the same bug report → nearby vectors → same search result.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ NEURAL NETS ════════════════════════════════════ -->
+<section id="nn">
+  <div class="slide appear">
+    <div class="eyebrow">Neural Networks and Vector Math</div>
+    <h2>The essence: transform vectors through learned layers</h2>
+    <div class="g2">
+      <div class="card"><h3>Vector</h3><p>A list of numbers encoding meaning. <code>cat → [0.12, -0.45, 0.88, …]</code> — typically 768 to 4096 dimensions.</p></div>
+      <div class="card"><h3>Neural network</h3><p>A large adjustable machine that transforms input vectors into progressively more useful output vectors.</p></div>
+      <div class="card"><h3>Matrix multiplication</h3><p>The engine of every layer: <strong>input vector × weight matrix = transformed vector</strong>. Billions of these happen per token.</p></div>
+      <div class="card"><h3>Training</h3><p>Predict → measure error → nudge weights slightly. Repeat on trillions of tokens until the model captures language.</p></div>
+    </div>
+    <div class="math-grid">
+      <div class="math-tile"><strong>Vector addition</strong><span>combine meanings</span></div>
+      <div class="math-tile"><strong>Dot product</strong><span>measure similarity</span></div>
+      <div class="math-tile"><strong>Matrix multiply</strong><span>transform context</span></div>
+      <div class="math-tile"><strong>Softmax</strong><span>scores → probabilities</span></div>
+      <div class="math-tile"><strong>Backprop</strong><span>learn from error</span></div>
+    </div>
+    <div class="note"><strong>Mental model:</strong> Don't teach the calculus. The key insight is: language → vectors → neural layers transform those vectors → the model learns which transformations produce good predictions.</div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════ TRAINING ═════════════════════════════════════ -->
+<section id="training">
+  <div class="slide appear">
+    <div class="eyebrow">How Learning Happens</div>
+    <h2>Training: predict → measure error → adjust weights</h2>
+    <p>During pre-training the model sees the next token masked and tries to predict it. Wrong prediction → error signal → tiny weight adjustment. This repeats across trillions of tokens, encoding grammar, facts, code patterns, and reasoning heuristics.</p>
+    <canvas id="loss-canvas" height="220"></canvas>
+    <div class="pipeline">
+      <div class="machine">
+        <div class="stage">Input: <strong>The capital of France is ___</strong></div>
+        <div class="stage">Model predicts: <strong>London</strong></div>
+        <div class="stage">Training target: <strong>Paris</strong></div>
+        <div class="stage">Loss: prediction was wrong → adjust</div>
+        <div class="stage">Repeat: billions of examples</div>
+      </div>
+      <div>
+        <h3>Three training phases</h3>
+        <div class="stepper">
+          <div class="step"><div class="step-body"><strong>Pre-training</strong><br>Massive unlabelled text/code. Learns broad language + world knowledge.</div></div>
+          <div class="step"><div class="step-body"><strong>Supervised Fine-tuning (SFT)</strong><br>Human-written (prompt, ideal response) pairs. Teaches instruction-following.</div></div>
+          <div class="step"><div class="step-body"><strong>RLHF / Preference tuning</strong><br>Human rankers prefer response A over B. Reinforcement nudges model toward preferred outputs.</div></div>
+        </div>
+        <div class="presenter"><strong>Presenter:</strong> "Pre-training builds the knowledge. SFT builds the assistant behaviour. RLHF polishes style and safety."</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ BEFORE TRANSFORMERS ════════════════════════════ -->
+<section id="rnn">
+  <div class="slide appear">
+    <div class="eyebrow">Before Transformers</div>
+    <h2>Encoder–Decoder and the bottleneck problem</h2>
+    <div class="pipeline">
+      <div class="machine">
+        <div class="stage">Input: <strong>I love llamas</strong></div>
+        <div class="stage">Encoder RNN: process left-to-right</div>
+        <div class="stage" style="border-color:rgba(255,90,90,.4);color:var(--red)">Context vector: one fixed-size vector</div>
+        <div class="stage">Decoder RNN: generate output</div>
+        <div class="stage">Output: <strong>Ik hou van lama's</strong></div>
+      </div>
+      <div>
+        <h3>The bottleneck problem</h3>
+        <p>For short sentences this works. For a long Spring Boot stack trace, a full JIRA ticket, or a multi-file PR — compressing everything into one fixed vector loses details mid-sequence.</p>
+        <br>
+        <h3>The conceptual bridge</h3>
+        <p><strong>Attention</strong> was originally added to RNN seq2seq to let the decoder look back at all encoder states — not just the final compressed one. This idea grew into the full Transformer.</p>
+        <div class="note">The key failure mode was called the <em>vanishing gradient</em> — information about early tokens faded as sequences got longer. Attention solved this by allowing direct connections between any two positions.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ ATTENTION ══════════════════════════════════════ -->
+<section id="attention">
+  <div class="slide appear">
+    <div class="eyebrow">The Transformer Breakthrough</div>
+    <h2>Attention: every token can look at every other token</h2>
+    <p>The Transformer computes an <em>attention score</em> between every pair of tokens in the sequence. This lets the model directly resolve references ("it" → "the API"), handle long dependencies, and weigh what's relevant for each position — all in parallel.</p>
+
+    <div class="attn-wrap">
+      <div class="attn-btns" id="attnBtns">
+        <button class="attn-btn on" onclick="renderAttn(0,this)">Focus: "it"</button>
+        <button class="attn-btn" onclick="renderAttn(1,this)">Focus: "500"</button>
+        <button class="attn-btn" onclick="renderAttn(2,this)">Focus: "fixed"</button>
+        <button class="attn-btn" onclick="renderAttn(3,this)">Focus: "auth"</button>
+      </div>
+      <div style="overflow-x:auto;margin-top:12px">
+        <table class="attn-table" id="attnTable"></table>
+      </div>
+      <p style="font-size:13px;color:var(--muted);margin-top:12px">Darker cell = higher attention weight. The model attends to the tokens most relevant for generating or contextualising the focused word.</p>
+    </div>
+
+    <div class="g2" style="margin-top:18px">
+      <div class="card"><h3>Without attention</h3><p>The model processes left-to-right and may lose early context by the time it reaches distant tokens.</p></div>
+      <div class="card"><h3>With attention (multi-head)</h3><p>"it" directly attends to "API". "500" attends to "returning". Different heads capture different relationship types simultaneously.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ TRANSFORMER ARCH ═════════════════════════════════ -->
+<section id="transformer">
+  <div class="slide appear">
+    <div class="eyebrow">Inside a Transformer LLM</div>
+    <h2>Tokenizer → Embeddings → Blocks → LM Head</h2>
+    <p>Every token generation requires one full forward pass through the entire model stack. The LM head converts the final layer's output into a probability distribution over the entire vocabulary (~32K–100K+ tokens).</p>
+    <canvas id="transformer-canvas" height="300"></canvas>
+    <div class="g2" style="margin-top:18px">
+      <div class="card">
+        <h3>One Transformer block contains</h3>
+        <div style="margin-top:10px;display:grid;gap:8px">
+          <div style="padding:8px 12px;background:rgba(0,229,255,.08);border:1px solid rgba(0,229,255,.2);border-radius:10px;font-size:14px;color:var(--muted)"><strong style="color:#fff">Multi-Head Self-Attention</strong> — compute relevance between all token pairs</div>
+          <div style="padding:8px 12px;background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.2);border-radius:10px;font-size:14px;color:var(--muted)"><strong style="color:#fff">Feed-Forward Network</strong> — per-token non-linear transformation</div>
+          <div style="padding:8px 12px;background:rgba(61,255,160,.08);border:1px solid rgba(61,255,160,.2);border-radius:10px;font-size:14px;color:var(--muted)"><strong style="color:#fff">Layer Norm + Residual</strong> — training stability, preserves gradient flow</div>
+        </div>
+      </div>
+      <div class="card">
+        <h3>Scale in numbers</h3>
+        <div style="display:grid;gap:10px;margin-top:10px">
+          <div><span class="big-num" style="font-size:36px;color:var(--cyan)">96</span><span style="color:var(--muted);font-size:14px;margin-left:8px">Transformer blocks (GPT-4 class)</span></div>
+          <div><span class="big-num" style="font-size:36px;color:var(--violet)">~1T</span><span style="color:var(--muted);font-size:14px;margin-left:8px">Parameters (frontier models)</span></div>
+          <div><span class="big-num" style="font-size:36px;color:var(--amber)">1M+</span><span style="color:var(--muted);font-size:14px;margin-left:8px">Token context window (Claude 3.5+)</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ GENERATION ════════════════════════════════════ -->
+<section id="generate">
+  <div class="slide appear">
+    <div class="eyebrow">Autoregressive Generation</div>
+    <h2>LLMs generate one token at a time</h2>
+    <div class="demo-box">
+      <div style="font-size:14px;color:var(--muted);margin-bottom:8px"><strong style="color:#fff">Prompt:</strong> Complete this Spring Boot endpoint Javadoc:</div>
+      <div class="gen-output" id="genOutput" style="font-size:20px;font-family:'IBM Plex Mono',monospace;color:var(--cyan)"></div>
+      <button class="btn" onclick="runGeneration()" style="margin-top:12px">▶ Animate generation</button>
+    </div>
+    <div style="margin-top:16px">
+      <div style="font-size:13px;font-weight:600;color:var(--muted);margin-bottom:10px;font-family:'IBM Plex Mono',monospace;text-transform:uppercase;letter-spacing:.06em">Top-5 next-token probabilities (live)</div>
+      <div class="prob-bars" id="probBars">
+        <div class="prob-row"><span>—</span><div class="prob-track"><div class="prob-fill" style="width:0%"></div></div><span class="prob-val">0%</span></div>
+        <div class="prob-row"><span>—</span><div class="prob-track"><div class="prob-fill" style="width:0%"></div></div><span class="prob-val">0%</span></div>
+        <div class="prob-row"><span>—</span><div class="prob-track"><div class="prob-fill" style="width:0%"></div></div><span class="prob-val">0%</span></div>
+        <div class="prob-row"><span>—</span><div class="prob-track"><div class="prob-fill" style="width:0%"></div></div><span class="prob-val">0%</span></div>
+        <div class="prob-row"><span>—</span><div class="prob-track"><div class="prob-fill" style="width:0%"></div></div><span class="prob-val">0%</span></div>
+      </div>
+    </div>
+    <div class="note" style="margin-top:18px"><strong>Important:</strong> Each token is a separate forward pass. Early wrong assumptions compound forward — this is why giving clear context upfront matters so much.</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ SYSTEM PROMPTS ═════════════════════════════════ -->
+<section id="system-prompt">
+  <div class="slide appear">
+    <div class="eyebrow">Instruction Interface</div>
+    <h2>System prompts and the chat turn structure</h2>
+    <p>Instruction-tuned LLMs expect a structured conversation format. The <strong>system prompt</strong> sets the model's role, persona, and constraints. Then alternating user/assistant turns form the context window the model reasons over.</p>
+
+    <div class="chat-thread">
+      <div class="chat-bubble bubble-system">
+        <span class="bubble-label">🔧 System</span>
+        You are a senior Java engineer reviewing pull requests. You are concise and direct. Always flag: (1) security issues first, (2) performance anti-patterns, (3) code style. Never hallucinate — if unsure, say so explicitly.
+      </div>
+      <div class="chat-bubble bubble-user">
+        <span class="bubble-label">👤 User</span>
+        Review this method:<br><br>
+        <span style="color:#c9d8ff">@GetMapping("/orders/{id}")<br>public Order getOrder(@PathVariable String id) {<br>&nbsp;&nbsp;return db.query("SELECT * FROM orders WHERE id = " + id);<br>}</span>
+      </div>
+      <div class="chat-bubble bubble-asst">
+        <span class="bubble-label">🤖 Assistant</span>
+        🚨 <strong>Critical security issue:</strong> SQL injection vulnerability. User-controlled `id` is concatenated directly into the query. Use parameterised queries: <code>db.query("SELECT * FROM orders WHERE id = ?", id)</code>.<br><br>
+        Also consider: validate `id` format, add authorisation check (can this user see this order?), and handle the null case.
+      </div>
+    </div>
+
+    <div class="g2" style="margin-top:22px">
+      <div class="card">
+        <h3>Why the system prompt matters</h3>
+        <p>It's the only persistent context across all turns. It shapes persona, output format, domain focus, and safety guardrails. In agent systems (like Rudhra), the system prompt carries tool definitions and workspace context.</p>
+      </div>
+      <div class="card">
+        <h3>How instruction tuning enables this</h3>
+        <p>SFT training teaches the model to follow the structure. RLHF teaches it to be useful and safe within that structure. Without these training phases, the model would just continue text — not behave like an assistant.</p>
+      </div>
+    </div>
+
+    <div class="warn"><strong>Agent note (Rudhra-specific):</strong> In agentic workflows the system prompt also carries tool schemas, workspace ID, available connectors, and HITL checkpoint instructions. Getting the system prompt right is the primary tuning lever for agent behaviour.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════ RAG ════════════════════════════════════════ -->
+<section id="rag">
+  <div class="slide appear">
+    <div class="eyebrow">Retrieval-Augmented Generation</div>
+    <h2>RAG: giving the model current, private knowledge</h2>
+    <p>LLMs have a training cutoff and cannot see your internal docs, latest Confluence pages, or production configs. RAG solves this: retrieve relevant chunks from your knowledge base and inject them into the context before generation.</p>
+
+    <div class="rag-flow" id="rag-pipeline">
+      <div class="rag-step">
+        <div class="rag-num">1</div>
+        <div class="rag-content"><b>User query arrives</b><small>"How does the OrderService HITL checkpoint work in our architecture?"</small></div>
+      </div>
+      <div class="rag-step">
+        <div class="rag-num">2</div>
+        <div class="rag-content"><b>Embed the query</b><small>Query → embedding vector via the same model (e.g. text-embedding-3-large). Same space as the doc chunks.</small></div>
+      </div>
+      <div class="rag-step">
+        <div class="rag-num">3</div>
+        <div class="rag-content"><b>Vector search over knowledge base</b><small>Find top-K most similar chunks in Supabase pgvector / Pinecone / Weaviate. "HITL checkpoint", "OrderService architecture", "Rudhra checkpoint store" → cosine similarity match.</small></div>
+      </div>
+      <div class="rag-step">
+        <div class="rag-num">4</div>
+        <div class="rag-content"><b>Inject retrieved context into prompt</b><small>Prepend the retrieved Confluence pages / code snippets to the system prompt or user message. Now the model has real, current information.</small></div>
+      </div>
+      <div class="rag-step">
+        <div class="rag-num">5</div>
+        <div class="rag-content"><b>LLM generates grounded answer</b><small>Response is grounded in your actual docs. Hallucination risk drops dramatically. Model can also cite the source chunk.</small></div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:18px"><strong>When to use RAG:</strong> Private/internal knowledge, frequently changing content (docs, tickets, configs), large corpora that don't fit in context, and when you need source citations.</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ TOOL USE ════════════════════════════════════════ -->
+<section id="tools">
+  <div class="slide appear">
+    <div class="eyebrow">Extending LLM Capabilities</div>
+    <h2>Tool use: LLMs calling your APIs</h2>
+    <p>Function calling allows the model to emit a structured JSON call instead of free text when it determines it needs real-time information or must take an action. Your code executes the function and returns the result. The model incorporates it into its next response.</p>
+
+    <div class="g2">
+      <div>
+        <h3 style="margin-bottom:14px">Tool definition (JSON Schema)</h3>
+        <div class="codeblock">{
+  <span class="key">"name"</span>: <span class="str">"get_jira_issue"</span>,
+  <span class="key">"description"</span>: <span class="str">"Fetch a Jira ticket by ID"</span>,
+  <span class="key">"parameters"</span>: {
+    <span class="key">"type"</span>: <span class="str">"object"</span>,
+    <span class="key">"properties"</span>: {
+      <span class="key">"issue_key"</span>: {
+        <span class="key">"type"</span>: <span class="str">"string"</span>,
+        <span class="key">"description"</span>: <span class="str">"e.g. RUD-120"</span>
+      }
+    },
+    <span class="key">"required"</span>: [<span class="str">"issue_key"</span>]
+  }
+}</div>
+      </div>
+      <div>
+        <h3 style="margin-bottom:14px">Round-trip flow</h3>
+        <div class="tool-flow">
+          <div class="tool-msg tool-llm"><span class="tool-label">LLM decides</span>I need the current status of RUD-120 to answer this.</div>
+          <div class="tool-arrow-row">↓</div>
+          <div class="tool-msg tool-call"><span class="tool-label">Function call emitted</span><span class="key">get_jira_issue</span>({ <span class="key">"issue_key"</span>: <span class="str">"RUD-120"</span> })</div>
+          <div class="tool-arrow-row">↓</div>
+          <div class="tool-msg tool-result"><span class="tool-label">Your code executes + returns</span>{ <span class="key">"status"</span>: <span class="str">"Done"</span>, <span class="key">"assignee"</span>: <span class="str">"Natarajan"</span>, <span class="key">"points"</span>: <span class="val">5</span> }</div>
+          <div class="tool-arrow-row">↓</div>
+          <div class="tool-msg tool-llm"><span class="tool-label">LLM incorporates result</span>RUD-120 is Done (5 points), assigned to Natarajan. The v0.10 milestone review is complete.</div>
+        </div>
+      </div>
+    </div>
+    <div class="warn"><strong>Security note for agent builders:</strong> Tool inputs come from the LLM — treat them as untrusted user input. Validate, sanitise, and apply the principle of least privilege. Prompt injection can hijack tool calls.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ TEMPERATURE ════════════════════════════════════ -->
+<section id="temperature">
+  <div class="slide appear">
+    <div class="eyebrow">Probability and Sampling</div>
+    <h2>How the model picks the next token</h2>
+    <p>The LM head produces scores for every token in the vocabulary (~32K+). Sampling settings determine whether the model always picks the most likely token (<em>greedy</em>) or samples from the distribution with some randomness (<em>temperature &gt; 0</em>).</p>
+    <div class="pipeline">
+      <div class="machine">
+        <h3 style="margin-bottom:12px">Context: <code style="font-size:13px">The developer fixed the bug by checking the ___</code></h3>
+        <div style="margin-top:10px">
+          <div class="prob-row" style="margin:10px 0"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted)">logs</span><div class="prob-track"><div class="prob-fill" style="width:84%;animation:growX 1s ease .2s both"></div></div><span class="prob-val">42%</span></div>
+          <div class="prob-row" style="margin:10px 0"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted)">config</span><div class="prob-track"><div class="prob-fill" style="width:48%;animation:growX 1s ease .35s both"></div></div><span class="prob-val">24%</span></div>
+          <div class="prob-row" style="margin:10px 0"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted)">database</span><div class="prob-track"><div class="prob-fill" style="width:28%;animation:growX 1s ease .5s both"></div></div><span class="prob-val">14%</span></div>
+          <div class="prob-row" style="margin:10px 0"><span style="font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted)">API</span><div class="prob-track"><div class="prob-fill" style="width:18%;animation:growX 1s ease .65s both"></div></div><span class="prob-val">9%</span></div>
+        </div>
+      </div>
+      <div>
+        <h3>Temperature</h3>
+        <div class="temp-scale">
+          <div class="scale-row"><strong style="color:var(--green)">Low (0.1)</strong><div class="scale-track"><span class="knob" style="left:8%"></span></div><span class="scale-label">Predictable, focused — good for code and structured output</span></div>
+          <div class="scale-row"><strong style="color:var(--amber)">Medium (0.7)</strong><div class="scale-track"><span class="knob" style="left:50%"></span></div><span class="scale-label">Balanced — good for Q&amp;A and explanations</span></div>
+          <div class="scale-row"><strong style="color:var(--red)">High (1.2)</strong><div class="scale-track"><span class="knob" style="left:86%"></span></div><span class="scale-label">Creative, riskier — good for brainstorming</span></div>
+        </div>
+        <div class="note" style="margin-top:18px"><strong>Engineering rule:</strong> Set temperature low (0–0.2) for code generation, structured JSON output, and fact extraction. Higher for creative naming, documentation drafts, and idea generation.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ CAPACITY ══════════════════════════════════════ -->
+<section id="capacity">
+  <div class="slide appear">
+    <div class="eyebrow">Capacity &amp; Limits</div>
+    <h2>Context window vs model parameters</h2>
+    <div class="compare" style="margin-top:0">
+      <div class="card" style="border-top:3px solid var(--cyan)">
+        <div class="big-num" style="color:var(--cyan)">Context</div>
+        <h3 style="margin-top:10px">What the model can see now</h3>
+        <p>Prompt, system prompt, tool definitions, RAG chunks, chat history, generated output — all consume context tokens. When the window fills, older tokens are dropped.</p>
+      </div>
+      <div class="card" style="border-top:3px solid var(--violet)">
+        <div class="big-num" style="color:var(--violet)">Params</div>
+        <h3 style="margin-top:10px">What the model learned in training</h3>
+        <p>7B, 70B, 400B+ adjustable weights. More parameters → richer language understanding, stronger reasoning, better code generation — but higher inference cost.</p>
+      </div>
+    </div>
+    <div class="g2">
+      <div class="card"><h3>Large context helps when…</h3><p>Including long stack traces, full Jira epics, code files, meeting transcripts, or long conversation history. Claude 3.5 supports 200K tokens (~150K words).</p></div>
+      <div class="card"><h3>More parameters help when…</h3><p>The task requires stronger multi-step reasoning, complex code generation, nuanced language understanding, or reliable factual recall.</p></div>
+    </div>
+    <p class="lead" style="margin-top:22px">Context gives evidence. Parameters give capability. Validation gives trust.</p>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════ LIMITS ═══════════════════════════════════════ -->
+<section id="limits">
+  <div class="slide appear">
+    <div class="eyebrow">Reality Check</div>
+    <h2>Why LLMs can be useful and still wrong</h2>
+    <p>LLMs generate <em>likely</em> text based on learned patterns and current context. They do not have access to your production state, real-time data, private architecture, or post-training events unless you explicitly provide them.</p>
+    <div class="g2">
+      <div class="card"><h3 style="color:var(--red)">Hallucination</h3><p>The model produces confident but false content — invented APIs, wrong method signatures, fabricated references, or plausible-sounding but incorrect reasoning.</p></div>
+      <div class="card"><h3 style="color:var(--amber)">Missing context</h3><p>Without logs, code, configs, and error messages, answers are generic speculation. Garbage in → garbage out applies here harder than anywhere.</p></div>
+      <div class="card"><h3 style="color:var(--muted)">Stale knowledge</h3><p>Training cutoff means the model may not know the latest Spring Boot version, Angular 19 APIs, or your new microservice — unless you include that information.</p></div>
+      <div class="card"><h3 style="color:var(--pink)">Prompt injection</h3><p>Malicious content in RAG chunks or tool responses can hijack model behaviour. Critical for agent builders: never trust LLM tool inputs without validation.</p></div>
+    </div>
+    <div class="compare">
+      <div class="card compare-bad"><strong style="color:var(--red)">Bad prompt</strong><p style="margin-top:8px">"Why did production fail?"</p></div>
+      <div class="card compare-good"><strong style="color:var(--green)">Better prompt</strong><p style="margin-top:8px">"Here is the stack trace [paste], the deployment diff [paste], and the method signature [paste]. Identify likely causes and rank by confidence."</p></div>
+    </div>
+    <div class="presenter"><strong>Team rule:</strong> AI output is a high-quality draft, not a final decision. Important outputs need verification through tests, source documents, peer review, or logs.</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ PLAYBOOK ════════════════════════════════════════ -->
+<section id="playbook">
+  <div class="slide appear">
+    <div class="eyebrow">Engineer's Playbook</div>
+    <h2>Prompting patterns that actually work</h2>
+    <p>Good prompts are not magic words — they're information engineering. Give the model role, context, format constraints, and examples.</p>
+    <div class="playbook-grid">
+
+      <div class="pb-card">
+        <div class="pb-tag" style="background:rgba(0,229,255,.12);color:var(--cyan);border:1px solid rgba(0,229,255,.25)">Role prompting</div>
+        <h3>Set a persona</h3>
+        <div class="codeblock" style="font-size:12px;margin-top:10px"><span class="cm">// System prompt</span>
+<span class="str">You are a senior Java engineer specialising
+in Spring Boot microservices and performance.
+Be direct. Prioritise security issues first.</span></div>
+        <p style="margin-top:10px;font-size:14px">Narrows the model's prior — it writes at a higher technical level, uses correct terminology, and focuses on what matters to engineers.</p>
+      </div>
+
+      <div class="pb-card">
+        <div class="pb-tag" style="background:rgba(124,92,255,.12);color:#c8b4ff;border:1px solid rgba(124,92,255,.25)">Few-shot</div>
+        <h3>Show examples</h3>
+        <div class="codeblock" style="font-size:12px;margin-top:10px"><span class="cm">// Provide input-output pairs</span>
+Input: getOrderById
+Output: <span class="str">"Retrieves order by ID"</span>
+
+Input: processPaymentRefund
+Output: <span class="str">"Processes refund for payment"</span>
+
+Input: validateUserPermissions
+Output: <span class="str">___</span></div>
+        <p style="margin-top:10px;font-size:14px">Two or three examples dramatically improve output format and style consistency — especially for structured generation tasks.</p>
+      </div>
+
+      <div class="pb-card">
+        <div class="pb-tag" style="background:rgba(61,255,160,.1);color:var(--green);border:1px solid rgba(61,255,160,.25)">Chain-of-thought</div>
+        <h3>Ask for reasoning steps</h3>
+        <div class="codeblock" style="font-size:12px;margin-top:10px"><span class="cm">// Add to the end of your prompt:</span>
+<span class="str">"Think step by step. First identify what
+the error message tells us. Then consider
+the call stack. Then propose a fix."</span></div>
+        <p style="margin-top:10px;font-size:14px">Forces the model to reason before concluding. Significantly reduces hallucination on multi-step debugging and architecture problems.</p>
+      </div>
+
+      <div class="pb-card">
+        <div class="pb-tag" style="background:rgba(255,190,61,.1);color:var(--amber);border:1px solid rgba(255,190,61,.25)">Structured output</div>
+        <h3>Specify exact format</h3>
+        <div class="codeblock" style="font-size:12px;margin-top:10px"><span class="cm">// Tell the model exactly what to return</span>
+<span class="str">"Return valid JSON only:
+{
+  issue: string,
+  severity: 'low'|'medium'|'critical',
+  fix: string,
+  confidence: number (0-1)
+}"</span></div>
+        <p style="margin-top:10px;font-size:14px">Essential for integration with your services. Combine with low temperature and parse defensively — never trust raw LLM JSON without schema validation.</p>
+      </div>
+    </div>
+    <div class="note" style="margin-top:22px"><strong>Golden rule:</strong> The more context and constraints you give, the less the model has to guess. Every guess is a hallucination risk.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ CLOSE ══════════════════════════════════════════ -->
+<section id="close">
+  <div class="slide appear">
+    <div class="eyebrow">Session Close</div>
+    <h2>What to carry forward</h2>
+    <div class="g2">
+      <div class="card"><h3>Text → tokens → vectors</h3><p>The model never reads English — it reads token IDs mapped to vectors in a high-dimensional space.</p></div>
+      <div class="card"><h3>Transformers use attention</h3><p>Every token can attend to every other. This solves the long-range dependency problem and is why modern LLMs handle full codebases.</p></div>
+      <div class="card"><h3>Generation is probabilistic</h3><p>Each token is sampled from a distribution. Temperature controls creativity. Low = deterministic; high = imaginative.</p></div>
+      <div class="card"><h3>Context is your primary lever</h3><p>System prompts, RAG, tool results, and examples all shape context. Better context → better output. Validate everything.</p></div>
+    </div>
+    <div class="stepper" style="margin-top:22px">
+      <div class="step"><div class="step-body"><strong>For debugging:</strong> paste the actual error, stack trace, relevant code, and config. Ask for ranked hypotheses with reasoning.</div></div>
+      <div class="step"><div class="step-body"><strong>For code generation:</strong> specify language, framework version, constraints, and show a before/after example if you can.</div></div>
+      <div class="step"><div class="step-body"><strong>For agents (Rudhra):</strong> the system prompt carries the agent's identity and tools. HITL checkpoints + validation loops are your safety net.</div></div>
+      <div class="step"><div class="step-body"><strong>Always:</strong> treat LLM output as a high-quality draft. Run tests, review diffs, verify facts against source documents.</div></div>
+    </div>
+    <p class="lead" style="margin-top:26px">Next CPD session: advanced prompting, RAG implementation, agents deep-dive, and safe usage in production.</p>
+  </div>
+</section>
+
+<footer>
+  <p>CPD Session 01 · LLM Foundations · 2026 &nbsp;·&nbsp;
+  Reference: <a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noreferrer">Attention Is All You Need (Vaswani et al., 2017)</a> &nbsp;·&nbsp;
+  <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noreferrer">OpenAI Tokenizer</a> &nbsp;·&nbsp;
+  Update timeline before presenting as model releases change frequently.</p>
+</footer>
+
+<script>
+/* ── PROGRESS BAR ── */
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = h.scrollTop / (h.scrollHeight - h.clientHeight) * 100;
+  document.getElementById('progress-bar').style.width = pct + '%';
+});
+
+/* ── INTERSECTION OBSERVER ── */
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      // animate hero flow when hero becomes visible
+      if (e.target.closest('#hero')) animateHeroFlow();
+      // draw loss curve when training section visible
+      if (e.target.closest('#training')) drawLossCurve();
+      // animate transformer when visible
+      if (e.target.closest('#transformer')) startTransformerAnim();
+      // draw embeddings
+      if (e.target.closest('#embeddings')) drawEmbeddings();
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.appear').forEach(el => io.observe(el));
+
+/* ── ACTIVE NAV ── */
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav a');
+const navObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      navLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`nav a[href="#${e.target.id}"]`);
+      if (link) { link.classList.add('active'); link.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'}); }
+    }
+  });
+}, { threshold: 0.4 });
+sections.forEach(s => navObserver.observe(s));
+
+/* ── HERO FLOW ANIMATION ── */
+let heroFlowAnimated = false;
+function animateHeroFlow() {
+  if (heroFlowAnimated) return;
+  heroFlowAnimated = true;
+  document.querySelectorAll('#hero-flow > *').forEach(el => {
+    el.style.opacity = '1';
+    el.style.transform = 'none';
+  });
+}
+
+/* ── TOKENIZER ── */
+function tokenizeDemo() {
+  const text = document.getElementById('tokenText').value.trim();
+  const out = document.getElementById('tokenOutput');
+  out.innerHTML = '';
+  if (!text) return;
+
+  const raw = text.match(/@[A-Za-z]+|\b[A-Za-z_][A-Za-z0-9_]*\b|\d+(\.\d+)?|[^\sA-Za-z0-9_]/g) || [];
+  const tokens = [];
+  raw.forEach(part => {
+    if (/^[A-Za-z_][A-Za-z0-9_]{8,}$/.test(part)) {
+      tokens.push({ t: part.slice(0, 5), type: 'word' });
+      tokens.push({ t: '##' + part.slice(5), type: 'sub' });
+    } else if (/^@[A-Za-z]+$/.test(part)) {
+      tokens.push({ t: part.slice(0, 5), type: 'word' });
+      tokens.push({ t: '##' + part.slice(5), type: 'sub' });
+    } else if (/^\d+(\.\d+)?$/.test(part)) {
+      tokens.push({ t: part, type: 'num' });
+    } else if (/^[A-Za-z_][A-Za-z0-9_]*$/.test(part)) {
+      tokens.push({ t: part, type: 'word' });
+    } else {
+      tokens.push({ t: part, type: 'punct' });
+    }
+  });
+
+  const typeLabels = { word:'word token', sub:'subword piece', num:'number token', punct:'punctuation', sym:'symbol' };
+  tokens.forEach((tok, i) => {
+    const el = document.createElement('div');
+    el.className = `tok tok-${tok.type}`;
+    el.style.animationDelay = `${i * 35}ms`;
+    el.innerHTML = `${escHtml(tok.t)}<div class="tok-tip">${typeLabels[tok.type] || tok.type} · ID ${1000+i}</div>`;
+    out.appendChild(el);
+  });
+
+  const statsEl = document.getElementById('tokenStats');
+  statsEl.style.display = 'flex';
+  document.getElementById('charCount').textContent = text.length;
+  document.getElementById('tokCount').textContent = tokens.length;
+  document.getElementById('tokRatio').textContent = (text.length / tokens.length).toFixed(1);
+}
+
+function escHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+tokenizeDemo();
+
+/* ── EMBEDDING CANVAS ── */
+const embedPoints = [
+  { x:.22, y:.28, label:'cat',           group:0 },
+  { x:.30, y:.22, label:'dog',           group:0 },
+  { x:.18, y:.35, label:'kitten',        group:0 },
+  { x:.72, y:.25, label:'apple',         group:1 },
+  { x:.80, y:.33, label:'banana',        group:1 },
+  { x:.77, y:.18, label:'mango',         group:1 },
+  { x:.28, y:.72, label:'Java',          group:2 },
+  { x:.38, y:.68, label:'Spring Boot',   group:2 },
+  { x:.47, y:.76, label:'@RestController',group:2},
+  { x:.60, y:.72, label:'NullPointerEx', group:3 },
+  { x:.68, y:.78, label:'null reference',group:3 },
+  { x:.78, y:.82, label:'chair',         group:4 },
+];
+const embedColors = [
+  'rgba(61,255,160,.85)',
+  'rgba(255,190,61,.85)',
+  'rgba(0,229,255,.85)',
+  'rgba(255,90,122,.85)',
+  'rgba(180,180,200,.6)',
+];
+let embedHover = -1;
+
+function drawEmbeddings() {
+  const canvas = document.getElementById('embed-canvas');
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 320;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // grid
+    ctx.strokeStyle = 'rgba(255,255,255,.05)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < W; x += 48) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y = 0; y < H; y += 48) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+
+    // lines connecting same group
+    [0,1,2,3].forEach(g => {
+      const pts = embedPoints.filter(p => p.group === g);
+      if (pts.length < 2) return;
+      ctx.strokeStyle = embedColors[g].replace('.85',',.35');
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4,4]);
+      for (let i = 0; i < pts.length; i++) {
+        for (let j = i+1; j < pts.length; j++) {
+          ctx.beginPath();
+          ctx.moveTo(pts[i].x * W, pts[i].y * H);
+          ctx.lineTo(pts[j].x * W, pts[j].y * H);
+          ctx.stroke();
+        }
+      }
+      ctx.setLineDash([]);
+    });
+
+    // dots
+    embedPoints.forEach((p, i) => {
+      const px = p.x * W, py = p.y * H;
+      const r = i === embedHover ? 28 : 22;
+      const col = embedColors[p.group];
+      ctx.beginPath();
+      ctx.arc(px, py, r * .45, 0, Math.PI * 2);
+      ctx.fillStyle = col.replace('.85',',.18');
+      ctx.fill();
+      ctx.strokeStyle = col;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = col;
+      ctx.font = `${i === embedHover ? 'bold ' : ''}${Math.min(13, W/60)}px "IBM Plex Mono", monospace`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.label, px, py);
+
+      if (i === embedHover) {
+        // show cosine sim tooltip
+        ctx.fillStyle = 'rgba(5,8,15,.9)';
+        const tw = ctx.measureText(p.label).width + 80;
+        ctx.beginPath();
+        ctx.roundRect(px - tw/2, py - 46, tw, 26, 8);
+        ctx.fill();
+        ctx.fillStyle = embedColors[p.group];
+        ctx.font = '11px "IBM Plex Mono", monospace';
+        ctx.fillText(`group: ${['animals','fruits','tech','errors','other'][p.group]}`, px, py - 33);
+      }
+    });
+  }
+  draw();
+
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    const mx = (e.clientX - rect.left), my = (e.clientY - rect.top);
+    embedHover = -1;
+    embedPoints.forEach((p, i) => {
+      const dx = p.x * W - mx, dy = p.y * H - my;
+      if (Math.sqrt(dx*dx+dy*dy) < 28) embedHover = i;
+    });
+    draw();
+  });
+  canvas.addEventListener('mouseleave', () => { embedHover = -1; draw(); });
+  window.addEventListener('resize', drawEmbeddings);
+}
+
+/* ── ATTENTION HEATMAP ── */
+const attnWords = ['The','API','returned','500','because','it','was','missing','auth'];
+const attnData = [
+  // focus: "it"
+  [.05,.72,.12,.05,.06,.98,.04,.06,.45],
+  // focus: "500"
+  [.08,.35,.65,.98,.22,.12,.08,.05,.15],
+  // focus: "fixed"
+  [.15,.48,.25,.18,.12,.55,.82,.22,.35],
+  // focus: "auth"
+  [.05,.25,.08,.12,.15,.55,.22,.35,.98],
+];
+let attnFocus = 0;
+
+function renderAttn(idx, btn) {
+  attnFocus = idx;
+  document.querySelectorAll('.attn-btn').forEach(b => b.classList.remove('on'));
+  btn.classList.add('on');
+  buildAttnTable();
+}
+
+function buildAttnTable() {
+  const table = document.getElementById('attnTable');
+  const weights = attnData[attnFocus];
+  let html = '<thead><tr><th></th>';
+  attnWords.forEach(w => html += `<th>${w}</th>`);
+  html += '</tr></thead><tbody>';
+  attnWords.forEach((row, ri) => {
+    html += `<tr><th style="text-align:right;padding-right:8px;color:var(--muted);font-size:12px">${row}</th>`;
+    attnWords.forEach((col, ci) => {
+      // symmetric-ish with focus word column amplified
+      const base = weights[ci] * weights[ri];
+      const a = Math.min(1, base * 2 + (ci === attnFocus || ri === attnFocus ? weights[ci] * .6 : 0));
+      const alpha = Math.round(a * 240);
+      const r = Math.round(124 + a * 80);
+      const g = Math.round(92 * (1 - a) + 229 * a);
+      const b = Math.round(255 * (1 - a * .5));
+      html += `<td style="background:rgba(${r},${g},${b},${(alpha/255).toFixed(2)});color:rgba(255,255,255,${a > .5 ? '.9' : '.5'})">${(a * 100).toFixed(0)}%</td>`;
+    });
+    html += '</tr>';
+  });
+  html += '</tbody>';
+  table.innerHTML = html;
+}
+buildAttnTable();
+
+/* ── LOSS CURVE ── */
+function drawLossCurve() {
+  const canvas = document.getElementById('loss-canvas');
+  if (!canvas || canvas._drawn) return;
+  canvas._drawn = true;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 220;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const pad = { t:20, r:20, b:40, l:50 };
+  const cW = W - pad.l - pad.r;
+  const cH = H - pad.t - pad.b;
+
+  // grid
+  ctx.strokeStyle = 'rgba(255,255,255,.06)';
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.t + cH * i / 4;
+    ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cW, y); ctx.stroke();
+    ctx.fillStyle = 'rgba(255,255,255,.35)';
+    ctx.font = '11px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.fillText((4 - i).toFixed(0), pad.l - 8, y + 4);
+  }
+  ctx.fillStyle = 'rgba(255,255,255,.35)';
+  ctx.font = '11px "IBM Plex Mono", monospace';
+  ctx.textAlign = 'center';
+  ctx.fillText('Training steps (billions)', pad.l + cW/2, H - 5);
+
+  // loss curve points (exponential decay + noise)
+  const pts = [];
+  for (let i = 0; i <= 80; i++) {
+    const t = i / 80;
+    const loss = 3.8 * Math.exp(-3.2 * t) + 0.45 + (Math.random() * .08 - .04);
+    pts.push({ x: pad.l + t * cW, y: pad.t + cH - (loss / 4.5) * cH });
+  }
+
+  // Phase labels
+  const phases = [
+    { x: .05, label: 'Pre-training', col: 'var(--cyan)' },
+    { x: .62, label: 'SFT', col: 'var(--violet)' },
+    { x: .81, label: 'RLHF', col: 'var(--amber)' },
+  ];
+  phases.forEach(ph => {
+    const px = pad.l + ph.x * cW;
+    ctx.strokeStyle = ph.col;
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.moveTo(px, pad.t); ctx.lineTo(px, pad.t + cH); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = ph.col;
+    ctx.font = 'bold 11px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'center';
+    ctx.fillText(ph.label, px, pad.t - 6);
+  });
+
+  // animate drawing
+  let progress = 0;
+  function frame() {
+    progress = Math.min(progress + 2, pts.length - 1);
+    ctx.clearRect(pad.l - 2, pad.t - 2, cW + 4, cH + 4);
+    // redraw grid lines (we cleared)
+    ctx.strokeStyle = 'rgba(255,255,255,.06)';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 4; i++) {
+      const y = pad.t + cH * i / 4;
+      ctx.beginPath(); ctx.moveTo(pad.l, y); ctx.lineTo(pad.l + cW, y); ctx.stroke();
+    }
+    // gradient fill
+    const grad = ctx.createLinearGradient(0, pad.t, 0, pad.t + cH);
+    grad.addColorStop(0, 'rgba(124,92,255,.25)');
+    grad.addColorStop(1, 'rgba(124,92,255,0)');
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pad.t + cH);
+    pts.slice(0, progress + 1).forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.lineTo(pts[progress].x, pad.t + cH);
+    ctx.closePath();
+    ctx.fillStyle = grad;
+    ctx.fill();
+    // line
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    pts.slice(1, progress + 1).forEach(p => ctx.lineTo(p.x, p.y));
+    ctx.strokeStyle = 'var(--violet)';
+    ctx.lineWidth = 2.5;
+    ctx.lineJoin = 'round';
+    ctx.stroke();
+    // dot at head
+    if (progress < pts.length - 1) {
+      ctx.beginPath();
+      ctx.arc(pts[progress].x, pts[progress].y, 4, 0, Math.PI*2);
+      ctx.fillStyle = 'var(--cyan)';
+      ctx.fill();
+      requestAnimationFrame(frame);
+    }
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ── TRANSFORMER ARCHITECTURE CANVAS ── */
+let tfAnimFrame;
+function startTransformerAnim() {
+  if (document.getElementById('transformer-canvas')._started) return;
+  document.getElementById('transformer-canvas')._started = true;
+  const canvas = document.getElementById('transformer-canvas');
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 300;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  const stages = [
+    { label: 'Tokenizer', sub: 'text → IDs', col: 'rgba(0,229,255,.9)' },
+    { label: 'Embeddings', sub: 'IDs → vectors', col: 'rgba(124,92,255,.9)' },
+    { label: 'Block ×N', sub: 'attn + FFN', col: 'rgba(124,92,255,.7)' },
+    { label: 'Layer Norm', sub: 'stabilise', col: 'rgba(61,255,160,.7)' },
+    { label: 'LM Head', sub: 'vocab probs', col: 'rgba(255,190,61,.9)' },
+  ];
+
+  const bw = Math.min(160, (W - 60) / stages.length - 14);
+  const bh = 70;
+  const gap = (W - stages.length * bw) / (stages.length + 1);
+  const y0 = (H - bh) / 2;
+
+  const boxes = stages.map((s, i) => ({
+    x: gap + i * (bw + gap),
+    y: y0,
+    w: bw, h: bh,
+    ...s
+  }));
+
+  const particles = [];
+  function spawnParticle() {
+    particles.push({ x: boxes[0].x + bw/2, y: y0 + bh/2, stage: 0, t: 0, speed: .018 + Math.random() * .012 });
+  }
+  setInterval(spawnParticle, 600);
+  spawnParticle();
+
+  let tick = 0;
+  function draw() {
+    ctx.clearRect(0, 0, W, H);
+    // connections
+    ctx.setLineDash([5,5]);
+    ctx.strokeStyle = 'rgba(255,255,255,.12)';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < boxes.length - 1; i++) {
+      ctx.beginPath();
+      ctx.moveTo(boxes[i].x + bw, y0 + bh/2);
+      ctx.lineTo(boxes[i+1].x, y0 + bh/2);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    // boxes
+    boxes.forEach((b, i) => {
+      ctx.fillStyle = 'rgba(5,8,15,.6)';
+      ctx.beginPath();
+      ctx.roundRect(b.x, b.y, b.w, b.h, 14);
+      ctx.fill();
+      ctx.strokeStyle = b.col;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+      // label
+      ctx.fillStyle = b.col;
+      ctx.font = `bold ${Math.min(13, W/52)}px "Syne", sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.fillText(b.label, b.x + b.w/2, b.y + b.h/2 - 6);
+      ctx.font = `${Math.min(11, W/60)}px "IBM Plex Mono", monospace`;
+      ctx.fillStyle = 'rgba(255,255,255,.45)';
+      ctx.fillText(b.sub, b.x + b.w/2, b.y + b.h/2 + 12);
+    });
+
+    // particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+      p.t += p.speed;
+      if (p.t >= 1) {
+        p.stage++;
+        p.t = 0;
+        if (p.stage >= boxes.length) { particles.splice(i, 1); continue; }
+      }
+      const src = boxes[p.stage];
+      const dst = p.stage < boxes.length - 1 ? boxes[p.stage + 1] : null;
+      let px, py;
+      if (p.t < .5) {
+        px = src.x + bw/2;
+        py = src.y + src.h/2;
+      } else if (dst) {
+        const ft = (p.t - .5) * 2;
+        px = src.x + bw + (dst.x - src.x - bw) * ft;
+        py = y0 + bh/2;
+      } else {
+        px = src.x + bw/2; py = src.y + src.h/2;
+      }
+      const col = src.col;
+      ctx.beginPath();
+      ctx.arc(px, py, 5, 0, Math.PI*2);
+      ctx.fillStyle = col.replace('.9',',.9').replace('.7',',.7');
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(px, py, 10, 0, Math.PI*2);
+      ctx.fillStyle = col.replace('.9',',.12').replace('.7',',.1');
+      ctx.fill();
+    }
+    tick++;
+    tfAnimFrame = requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+/* ── GENERATION ANIMATION ── */
+const genSteps = [
+  { token: '/**', probs: [['/**',52],['/*',22],['///',12],['@param',8],['@return',6]] },
+  { token: '\n * ', probs: [[' *',55],['\n',25],['*',12],['Returns',5],['Handles',3]] },
+  { token: 'Handles', probs: [['Handles',44],['Processes',28],['Returns',14],['Gets',9],['Validates',5]] },
+  { token: ' incoming', probs: [[' incoming',38],[' an',22],[' the',18],[' HTTP',14],['a',8]] },
+  { token: ' HTTP', probs: [[' HTTP',45],[' POST',22],[' GET',16],[' RESTful',12],['requests',5]] },
+  { token: ' request', probs: [[' request',58],[' requests',22],[' req',12],[',',5],['data',3]] },
+  { token: '.', probs:[['.',62],['s',14],[' and',12],[',',8],[' for',4]] },
+  { token: '\n * @param req', probs:[['\n',48],['@',22],[' *',18],[' Validates',8],['Returns',4]] },
+  { token: ' the HttpServletRequest', probs:[[' the',55],[' HttpServletRequest',30],[' request',12],[' object',3]] },
+  { token: '\n */', probs:[['\n */',65],['*/',22],['@return',8],[' */\n',5]] },
+];
+
+let genRunning = false;
+async function runGeneration() {
+  if (genRunning) return;
+  genRunning = true;
+  const out = document.getElementById('genOutput');
+  const rows = document.querySelectorAll('#probBars .prob-row');
+  out.innerHTML = '';
+  for (const step of genSteps) {
+    // update prob bars
+    step.probs.forEach(([tok, pct], i) => {
+      if (rows[i]) {
+        rows[i].children[0].textContent = tok;
+        rows[i].children[1].children[0].style.width = pct + '%';
+        rows[i].children[2].textContent = pct + '%';
+      }
+    });
+    // append token
+    out.innerHTML += step.token.replace(/\n/g, '<br>');
+    await delay(380);
+  }
+  out.innerHTML += '<span class="cursor"></span>';
+  genRunning = false;
+}
+const delay = ms => new Promise(r => setTimeout(r, ms));
+runGeneration();
+</script>
+</body>
+</html>
