@@ -1469,6 +1469,53 @@ make -j
       <div class="step"><div class="step-body"><strong>Always:</strong> treat LLM output as a high-quality draft. Run tests, review diffs, verify facts against source documents.</div></div>
     </div>
     <p class="lead" style="margin-top:26px">Next CPD session: advanced prompting, RAG implementation, agents deep-dive, and safe usage in production.</p>
+
+    <hr style="border:none;border-top:1px solid var(--border-1,rgba(255,255,255,.1));margin:32px 0;">
+
+    <div class="eyebrow" style="margin-bottom:16px">Go deeper — interactive tools &amp; illustrated guides</div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;">
+
+      <div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:border-color .2s,transform .2s" onmouseover="this.style.borderColor='rgba(0,229,255,.45)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎮 LLM Internals</div>
+        <a href="https://bbycroft.net/llm" target="_blank" rel="noreferrer" style="display:block;color:#fff;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:6px">bbycroft.net/llm ↗</a>
+        <p style="font-size:13px;margin:0">Brendan Bycroft's 3D transformer walkthrough — full forward pass (embeddings → attention → FFN → softmax) animated in 3D for GPT-2/Nano.</p>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:border-color .2s,transform .2s" onmouseover="this.style.borderColor='rgba(124,92,255,.45)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🎮 Transformer Explainer</div>
+        <a href="https://poloclub.github.io/transformer-explainer/" target="_blank" rel="noreferrer" style="display:block;color:#fff;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:6px">poloclub.github.io ↗</a>
+        <p style="font-size:13px;margin:0">Georgia Tech's interactive GPT-2 explainer. Click any token and watch attention weights and next-token probabilities update live.</p>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:border-color .2s,transform .2s" onmouseover="this.style.borderColor='rgba(61,255,160,.45)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">📚 Illustrated Guides</div>
+        <a href="https://jalammar.github.io" target="_blank" rel="noreferrer" style="display:block;color:#fff;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:6px">jalammar.github.io ↗</a>
+        <p style="font-size:13px;margin:0">Jay Alammar's blog — "The Illustrated Transformer", "Illustrated BERT", "Illustrated Word2Vec". Step-through animated diagrams, widely cited in ML courses.</p>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:border-color .2s,transform .2s" onmouseover="this.style.borderColor='rgba(255,190,61,.45)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🔢 Embedding Projector</div>
+        <a href="https://projector.tensorflow.org" target="_blank" rel="noreferrer" style="display:block;color:#fff;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:6px">projector.tensorflow.org ↗</a>
+        <p style="font-size:13px;margin:0">TensorFlow's 3D embedding visualiser. Upload your own vectors or explore built-in Word2Vec/BERT datasets with PCA and t-SNE projections.</p>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:border-color .2s,transform .2s" onmouseover="this.style.borderColor='rgba(255,90,122,.45)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">🌐 Nomic Atlas</div>
+        <a href="https://atlas.nomic.ai" target="_blank" rel="noreferrer" style="display:block;color:#fff;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:6px">atlas.nomic.ai ↗</a>
+        <p style="font-size:13px;margin:0">Visualise millions of real embeddings from Wikipedia, arXiv, and code datasets. See how large-scale semantic clustering actually looks.</p>
+      </div>
+
+      <div style="background:var(--bg3);border:1px solid var(--line);border-radius:var(--r);padding:18px;transition:border-color .2s,transform .2s" onmouseover="this.style.borderColor='rgba(0,229,255,.45)';this.style.transform='translateY(-3px)'" onmouseout="this.style.borderColor='';this.style.transform=''">
+        <div style="font-size:11px;font-family:'IBM Plex Mono',monospace;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">✂️ Tokeniser Playground</div>
+        <a href="https://platform.openai.com/tokenizer" target="_blank" rel="noreferrer" style="display:block;color:#fff;font-weight:700;font-size:14px;text-decoration:none;margin-bottom:6px">platform.openai.com/tokenizer ↗</a>
+        <p style="font-size:13px;margin:0">OpenAI's official tokenizer. Paste any text — code, Java, Dutch, Tamil — and see real token IDs and counts for GPT-3/4 tokenizers.</p>
+      </div>
+
+    </div>
+
+    <a href="vectors.html" style="display:inline-flex;align-items:center;gap:10px;margin-top:20px;padding:12px 22px;border-radius:999px;background:linear-gradient(135deg,rgba(0,229,255,.15),rgba(124,92,255,.15));border:1px solid rgba(0,229,255,.35);color:var(--cyan);text-decoration:none;font-size:14px;font-weight:700;transition:all .2s" onmouseover="this.style.background='linear-gradient(135deg,rgba(0,229,255,.25),rgba(124,92,255,.25))'" onmouseout="this.style.background='linear-gradient(135deg,rgba(0,229,255,.15),rgba(124,92,255,.15))'">
+      ↗ Our own explorer: Sentences → Vectors &nbsp;<span style="font-size:12px;opacity:.7;font-weight:400">interactive pipeline + cosine similarity + model dimensions</span>
+    </a>
   </div>
 </section>
 
