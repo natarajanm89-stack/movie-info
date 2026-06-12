@@ -1108,21 +1108,38 @@
   <div class="slide appear">
     <div class="eyebrow">Capacity &amp; Limits</div>
     <h2>Context window vs model parameters</h2>
-    <div class="compare" style="margin-top:0">
-      <div class="card" style="border-top:3px solid var(--cyan)">
-        <div class="big-num" style="color:var(--cyan)">Context</div>
-        <h3 style="margin-top:10px">What the model can see now</h3>
-        <p>Prompt, system prompt, tool definitions, RAG chunks, chat history, generated output — all consume context tokens. When the window fills, older tokens are dropped.</p>
+    <p>Two completely different concepts that engineers often conflate. Context is <em>what the model reads right now</em>. Parameters are <em>what the model learned during training</em>. Both matter — but they are independent axes.</p>
+
+    <!-- Context Window Visual -->
+    <div style="margin-top:28px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:14px;height:14px;border-radius:3px;background:var(--cyan)"></div>
+        <h3 style="margin:0;color:var(--cyan)">Context Window — what the model can see right now</h3>
       </div>
-      <div class="card" style="border-top:3px solid var(--violet)">
-        <div class="big-num" style="color:var(--violet)">Params</div>
-        <h3 style="margin-top:10px">What the model learned in training</h3>
-        <p>7B, 70B, 400B+ adjustable weights. More parameters → richer language understanding, stronger reasoning, better code generation — but higher inference cost.</p>
+      <p style="margin-bottom:14px">Every token in the prompt, system instructions, chat history, RAG chunks, and generated output sits inside this sliding window. When it fills, the oldest tokens are silently dropped.</p>
+      <canvas id="ctx-canvas" height="160" style="width:100%;border-radius:16px;display:block"></canvas>
+      <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:13px;font-family:'IBM Plex Mono',monospace">
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(255,90,90,.7);display:inline-block"></span>System prompt</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(124,92,255,.8);display:inline-block"></span>User message</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(61,255,160,.7);display:inline-block"></span>RAG chunks</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(255,190,61,.7);display:inline-block"></span>Assistant output</span>
+        <span style="display:flex;align-items:center;gap:6px"><span style="width:12px;height:12px;border-radius:3px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);display:inline-block"></span>Unused capacity</span>
       </div>
     </div>
-    <div class="g2">
-      <div class="card"><h3>Large context helps when…</h3><p>Including long stack traces, full Jira epics, code files, meeting transcripts, or long conversation history. Claude 3.5 supports 200K tokens (~150K words).</p></div>
-      <div class="card"><h3>More parameters help when…</h3><p>The task requires stronger multi-step reasoning, complex code generation, nuanced language understanding, or reliable factual recall.</p></div>
+
+    <!-- Parameters Visual -->
+    <div style="margin-top:34px">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px">
+        <div style="width:14px;height:14px;border-radius:3px;background:var(--violet)"></div>
+        <h3 style="margin:0;color:var(--violet)">Model Parameters — knowledge baked in during training</h3>
+      </div>
+      <p style="margin-bottom:14px">Billions of floating-point weights learned by adjusting on trillions of tokens. They are fixed at inference time. More parameters → richer representations, stronger reasoning, better code — but higher memory and cost.</p>
+      <canvas id="params-canvas" height="180" style="width:100%;border-radius:16px;display:block"></canvas>
+    </div>
+
+    <div class="g2" style="margin-top:22px">
+      <div class="card"><h3>Large context helps when…</h3><p>Including long stack traces, full Jira epics, multi-file code, meeting transcripts, or long conversation history. Claude 3.5 supports 200K tokens (~150K words).</p></div>
+      <div class="card"><h3>More parameters help when…</h3><p>The task requires stronger multi-step reasoning, complex code generation, nuanced language understanding, or reliable factual recall without explicit context.</p></div>
     </div>
     <p class="lead" style="margin-top:22px">Context gives evidence. Parameters give capability. Validation gives trust.</p>
   </div>
@@ -1480,6 +1497,8 @@ const io = new IntersectionObserver(entries => {
       if (e.target.closest('#transformer')) startTransformerAnim();
       // draw embeddings
       if (e.target.closest('#embeddings')) drawEmbeddings();
+      // draw capacity visuals
+      if (e.target.closest('#capacity')) drawCapacity();
     }
   });
 }, { threshold: 0.15 });
@@ -1969,6 +1988,272 @@ async function runGeneration() {
 }
 const delay = ms => new Promise(r => setTimeout(r, ms));
 runGeneration();
+
+/* ── CAPACITY: CONTEXT WINDOW + PARAMETERS ── */
+function drawCapacity() {
+  drawContextWindow();
+  drawParamsViz();
+}
+
+function drawContextWindow() {
+  const canvas = document.getElementById('ctx-canvas');
+  if (!canvas || canvas._drawn) return;
+  canvas._drawn = true;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 160;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Segments: label, fraction of window used, color
+  const segments = [
+    { label: 'System Prompt',   frac: .10, col: 'rgba(255,90,90,.75)',   tokens: '~800 tok' },
+    { label: 'Tool Definitions',frac: .08, col: 'rgba(255,90,90,.45)',   tokens: '~600 tok' },
+    { label: 'RAG Chunks (×3)', frac: .22, col: 'rgba(61,255,160,.7)',   tokens: '~1,800 tok' },
+    { label: 'User Message',    frac: .05, col: 'rgba(124,92,255,.85)',  tokens: '~400 tok' },
+    { label: 'Chat History',    frac: .12, col: 'rgba(124,92,255,.45)',  tokens: '~1,000 tok' },
+    { label: 'Asst. Response',  frac: .18, col: 'rgba(255,190,61,.75)',  tokens: '~1,500 tok' },
+  ];
+  const usedFrac = segments.reduce((a, s) => a + s.frac, 0);
+
+  const pad = 20;
+  const barH = 48;
+  const barY = 20;
+  const totalW = W - pad * 2;
+
+  // Animate fill progress
+  let progress = 0;
+  const targetProgress = 1;
+
+  function draw(p) {
+    ctx.clearRect(0, 0, W, H);
+
+    // Background track
+    ctx.fillStyle = 'rgba(255,255,255,.06)';
+    ctx.beginPath();
+    ctx.roundRect(pad, barY, totalW, barH, 10);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,.12)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Draw filled segments up to progress
+    let filled = 0;
+    const drawFrac = usedFrac * p;
+    segments.forEach(seg => {
+      const segW = seg.frac * totalW;
+      const startX = pad + filled * totalW;
+      const drawW = Math.min(segW, Math.max(0, (drawFrac - filled) * totalW));
+      if (drawW <= 0) return;
+      ctx.fillStyle = seg.col;
+      ctx.beginPath();
+      // round leading/trailing corners if first or last visible segment
+      const isFirst = filled === 0;
+      const isLast = filled + seg.frac >= drawFrac - .001;
+      const r = 8;
+      if (isFirst && isLast) {
+        ctx.roundRect(startX, barY, drawW, barH, r);
+      } else if (isFirst) {
+        ctx.roundRect(startX, barY, drawW, barH, [r, 0, 0, r]);
+      } else if (isLast) {
+        ctx.roundRect(startX, barY, drawW, barH, [0, r, r, 0]);
+      } else {
+        ctx.rect(startX, barY, drawW, barH);
+      }
+      ctx.fill();
+      // Label inside segment if wide enough
+      if (drawW > 60) {
+        ctx.fillStyle = 'rgba(255,255,255,.9)';
+        ctx.font = `bold ${Math.min(11, drawW / 8)}px "IBM Plex Mono", monospace`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        const labelX = startX + drawW / 2;
+        ctx.fillText(seg.label, labelX, barY + barH / 2 - 7);
+        ctx.font = `${Math.min(10, drawW / 9)}px "IBM Plex Mono", monospace`;
+        ctx.fillStyle = 'rgba(255,255,255,.55)';
+        ctx.fillText(seg.tokens, labelX, barY + barH / 2 + 8);
+      }
+      filled += seg.frac;
+    });
+
+    // Unused capacity
+    const unusedX = pad + drawFrac * totalW;
+    const unusedW = (1 - drawFrac) * totalW;
+    if (unusedW > 40 && p >= targetProgress) {
+      ctx.fillStyle = 'rgba(255,255,255,.04)';
+      ctx.beginPath();
+      ctx.roundRect(unusedX, barY, unusedW, barH, [0, 8, 8, 0]);
+      ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,.25)';
+      ctx.font = '11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Unused capacity', unusedX + unusedW / 2, barY + barH / 2);
+    }
+
+    // Usage percentage label
+    const pctUsed = Math.round(drawFrac * 100);
+    ctx.fillStyle = 'rgba(255,255,255,.55)';
+    ctx.font = '12px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'top';
+    ctx.fillText(`${pctUsed}% of context used  (~${Math.round(drawFrac * 128000).toLocaleString()} / 128K tokens)`, pad + totalW, barY + barH + 10);
+
+    // Overflow warning arrow (appears when near full)
+    if (p >= targetProgress) {
+      ctx.fillStyle = 'rgba(255,90,90,.8)';
+      ctx.font = 'bold 11px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('⚠ Oldest tokens dropped when window overflows', pad, barY + barH + 10);
+    }
+  }
+
+  function animate() {
+    progress = Math.min(targetProgress, progress + .018);
+    draw(progress);
+    if (progress < targetProgress) requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
+
+function drawParamsViz() {
+  const canvas = document.getElementById('params-canvas');
+  if (!canvas || canvas._drawn) return;
+  canvas._drawn = true;
+  const dpr = window.devicePixelRatio || 1;
+  const W = canvas.offsetWidth;
+  const H = 180;
+  canvas.width = W * dpr;
+  canvas.height = H * dpr;
+  canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+
+  // Models to compare as bubbles on a horizontal axis
+  const models = [
+    { name: 'Phi-3\nMini',      params: 3.8,  col: 'rgba(61,255,160,.8)',   tier: 'Laptop' },
+    { name: 'Llama 3.1\n8B',    params: 8,    col: 'rgba(0,229,255,.8)',    tier: 'GPU' },
+    { name: 'Mistral\n22B',     params: 22,   col: 'rgba(0,229,255,.65)',   tier: 'GPU server' },
+    { name: 'Llama 3.1\n70B',   params: 70,   col: 'rgba(124,92,255,.85)', tier: 'Multi-GPU' },
+    { name: 'GPT-4\nclass',     params: 220,  col: 'rgba(255,190,61,.9)',   tier: 'Cloud only' },
+    { name: 'Frontier\n~1T+',   params: 1000, col: 'rgba(255,90,90,.85)',   tier: 'Cloud only' },
+  ];
+
+  const maxLog = Math.log10(1000);
+  const pad = { l: 20, r: 20, t: 24, b: 50 };
+  const axisY = H - pad.b;
+  const axisW = W - pad.l - pad.r;
+
+  const maxR = 38;
+  const minR = 10;
+
+  function xPos(params) {
+    return pad.l + (Math.log10(params) / maxLog) * axisW;
+  }
+  function bubbleR(params) {
+    return minR + (Math.log10(params) / maxLog) * (maxR - minR);
+  }
+
+  let progress = 0;
+  function draw(p) {
+    ctx.clearRect(0, 0, W, H);
+
+    // Axis line
+    ctx.strokeStyle = 'rgba(255,255,255,.15)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(pad.l, axisY);
+    ctx.lineTo(pad.l + axisW, axisY);
+    ctx.stroke();
+
+    // Axis label
+    ctx.fillStyle = 'rgba(255,255,255,.3)';
+    ctx.font = '11px "IBM Plex Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.fillText('← fewer parameters', pad.l, H - 10);
+    ctx.textAlign = 'right';
+    ctx.fillText('more parameters →', pad.l + axisW, H - 10);
+
+    // Log-scale tick marks
+    [1, 3, 10, 30, 100, 300, 1000].forEach(v => {
+      const x = xPos(v);
+      ctx.strokeStyle = 'rgba(255,255,255,.1)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(x, axisY - 4); ctx.lineTo(x, axisY + 4); ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,.25)';
+      ctx.font = '10px "IBM Plex Mono", monospace';
+      ctx.textAlign = 'center';
+      ctx.fillText(v >= 1000 ? '1T' : v + 'B', x, axisY + 14);
+    });
+
+    // Bubbles
+    models.forEach((m, i) => {
+      const x = xPos(m.params);
+      const r = bubbleR(m.params);
+      const cy = axisY - r - 4;
+      const scale = Math.min(1, p * (models.length / (i + 1)) * .25);
+      const sr = r * Math.min(1, scale);
+
+      // Glow
+      const grd = ctx.createRadialGradient(x, cy, 0, x, cy, sr * 1.8);
+      grd.addColorStop(0, m.col.replace('.8',',.15').replace('.85',',.15').replace('.9',',.15').replace('.65',',.12'));
+      grd.addColorStop(1, 'transparent');
+      ctx.beginPath();
+      ctx.arc(x, cy, sr * 1.8, 0, Math.PI * 2);
+      ctx.fillStyle = grd;
+      ctx.fill();
+
+      // Bubble
+      ctx.beginPath();
+      ctx.arc(x, cy, sr, 0, Math.PI * 2);
+      ctx.fillStyle = m.col.replace('.8',',.18').replace('.85',',.18').replace('.9',',.18').replace('.65',',.14');
+      ctx.fill();
+      ctx.strokeStyle = m.col;
+      ctx.lineWidth = 1.8;
+      ctx.stroke();
+
+      if (scale >= .9) {
+        // Model name (handle \n)
+        const lines = m.name.split('\n');
+        ctx.fillStyle = '#fff';
+        ctx.font = `bold ${Math.min(11, sr * .42)}px "Syne", sans-serif`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        lines.forEach((line, li) => {
+          const lineY = cy - (lines.length - 1) * 6 / 2 + li * 13;
+          ctx.fillText(line, x, lineY);
+        });
+
+        // Tier label below axis
+        ctx.fillStyle = m.col;
+        ctx.font = '10px "IBM Plex Mono", monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'top';
+        ctx.fillText(m.tier, x, axisY + 20);
+      }
+
+      // Connector line from bubble to axis
+      ctx.strokeStyle = m.col.replace('.8',',.3').replace('.85',',.3').replace('.9',',.3').replace('.65',',.25');
+      ctx.lineWidth = 1;
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath();
+      ctx.moveTo(x, cy + sr);
+      ctx.lineTo(x, axisY);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    });
+  }
+
+  function animate() {
+    progress = Math.min(1, progress + .022);
+    draw(progress);
+    if (progress < 1) requestAnimationFrame(animate);
+  }
+  requestAnimationFrame(animate);
+}
 
 /* ── KEYBOARD SLIDE NAVIGATION ── */
 const slideIds = Array.from(document.querySelectorAll('section[id]')).map(s => s.id);
