@@ -676,6 +676,8 @@
   <a href="#capacity">Capacity</a>
   <a href="#limits">Limits</a>
   <a href="#playbook">Playbook</a>
+  <a href="#llm-types">LLM Types</a>
+  <a href="#local-llms">Local LLMs</a>
   <a href="#close">Close</a>
 </nav>
 
@@ -1204,6 +1206,228 @@ the call stack. Then propose a fix."</span></div>
       </div>
     </div>
     <div class="note" style="margin-top:22px"><strong>Golden rule:</strong> The more context and constraints you give, the less the model has to guess. Every guess is a hallucination risk.</div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ LLM TYPES ═════════════════════════════════════ -->
+<section id="llm-types">
+  <div class="slide appear">
+    <div class="eyebrow">Taxonomy</div>
+    <h2>Types of LLMs</h2>
+    <p>Not all LLMs are the same. They differ by architecture, training objective, size, access model, and intended use. Knowing the landscape helps you pick the right model for your task — or understand why a vendor chose what they did.</p>
+
+    <div class="g3" style="margin-top:28px">
+      <div class="card" style="border-top:3px solid var(--cyan)">
+        <h3 style="color:var(--cyan)">By Architecture</h3>
+        <div style="display:grid;gap:10px;margin-top:12px">
+          <div style="padding:10px 14px;background:rgba(0,229,255,.07);border:1px solid rgba(0,229,255,.18);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Decoder-only</strong>
+            <span style="font-size:13px;color:var(--muted)">GPT-4, Claude, Llama, Gemini — generates text left-to-right. The dominant architecture today.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Encoder-only</strong>
+            <span style="font-size:13px;color:var(--muted)">BERT, RoBERTa — understands text, great for classification and embeddings. Cannot generate.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(255,255,255,.05);border:1px solid var(--line);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Encoder-Decoder</strong>
+            <span style="font-size:13px;color:var(--muted)">T5, BART, mT5 — reads full input, then generates output. Good for translation and summarisation.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--violet)">
+        <h3 style="color:var(--violet)">By Size</h3>
+        <div style="display:grid;gap:10px;margin-top:12px">
+          <div style="padding:10px 14px;background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.2);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Small · 1B–7B params</strong>
+            <span style="font-size:13px;color:var(--muted)">Llama 3.2 1B/3B, Phi-3 Mini, Gemma 2B — runs on a laptop, fast inference, good for focused tasks.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.2);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Medium · 8B–70B params</strong>
+            <span style="font-size:13px;color:var(--muted)">Llama 3.1 8B/70B, Mistral 7B/22B — GPU server or high-end workstation. Strong coding + reasoning.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(124,92,255,.1);border:1px solid rgba(124,92,255,.3);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Large · 100B–1T+ params</strong>
+            <span style="font-size:13px;color:var(--muted)">GPT-4, Claude 3.5 Sonnet/Opus, Gemini 2.5 Pro — cloud API only. Frontier reasoning and code generation.</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--amber)">
+        <h3 style="color:var(--amber)">By Training Type</h3>
+        <div style="display:grid;gap:10px;margin-top:12px">
+          <div style="padding:10px 14px;background:rgba(255,190,61,.07);border:1px solid rgba(255,190,61,.18);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Base / Pretrained</strong>
+            <span style="font-size:13px;color:var(--muted)">Raw next-token prediction only. Not instruction-following. Useful as a foundation for fine-tuning.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(255,190,61,.07);border:1px solid rgba(255,190,61,.18);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Instruction-tuned / Chat</strong>
+            <span style="font-size:13px;color:var(--muted)">SFT + RLHF applied. Follows instructions, answers questions, writes code. What you use day-to-day.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(255,190,61,.07);border:1px solid rgba(255,190,61,.18);border-radius:12px">
+            <strong style="color:#fff;display:block;font-size:14px">Domain fine-tuned</strong>
+            <span style="font-size:13px;color:var(--muted)">Further trained on medical, legal, finance, or code data. StarCoder, CodeLlama, BioMedGPT etc.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-top:20px">
+      <div class="card" style="border-top:3px solid var(--green)">
+        <h3 style="color:var(--green)">By Access Model</h3>
+        <div style="margin-top:12px;display:grid;gap:10px">
+          <div style="display:flex;gap:12px;align-items:start;padding:10px 14px;background:rgba(61,255,160,.06);border:1px solid rgba(61,255,160,.18);border-radius:12px">
+            <span style="font-size:20px;flex-shrink:0">☁️</span>
+            <div><strong style="color:#fff;font-size:14px">Closed / API-only</strong><br><span style="font-size:13px;color:var(--muted)">GPT-4, Claude, Gemini. Highest capability, pay-per-token, data leaves your infra. Weights not published.</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:start;padding:10px 14px;background:rgba(61,255,160,.06);border:1px solid rgba(61,255,160,.18);border-radius:12px">
+            <span style="font-size:20px;flex-shrink:0">🔓</span>
+            <div><strong style="color:#fff;font-size:14px">Open-weight</strong><br><span style="font-size:13px;color:var(--muted)">Llama 3, Mistral, Phi-3, Gemma. Weights downloadable. Run locally or self-host. Fine-tune freely.</span></div>
+          </div>
+          <div style="display:flex;gap:12px;align-items:start;padding:10px 14px;background:rgba(61,255,160,.06);border:1px solid rgba(61,255,160,.18);border-radius:12px">
+            <span style="font-size:20px;flex-shrink:0">🏢</span>
+            <div><strong style="color:#fff;font-size:14px">Self-hosted / Enterprise</strong><br><span style="font-size:13px;color:var(--muted)">Deploy open-weight models on your own infra (Azure, AWS, on-prem). Full data sovereignty.</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--pink)">
+        <h3 style="color:var(--pink)">Specialised Model Families</h3>
+        <div style="margin-top:12px;display:grid;gap:8px">
+          <div style="padding:10px 14px;background:rgba(255,78,155,.07);border:1px solid rgba(255,78,155,.18);border-radius:12px">
+            <strong style="color:#fff;font-size:14px">Code LLMs</strong>
+            <span style="display:block;font-size:13px;color:var(--muted)">StarCoder 2, CodeLlama, DeepSeek-Coder — trained heavily on code. Better at completions, test gen, and review than general models at the same size.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(255,78,155,.07);border:1px solid rgba(255,78,155,.18);border-radius:12px">
+            <strong style="color:#fff;font-size:14px">Embedding models</strong>
+            <span style="display:block;font-size:13px;color:var(--muted)">text-embedding-3, nomic-embed, mxbai-embed — not generative; optimised to produce high-quality semantic vectors for RAG.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(255,78,155,.07);border:1px solid rgba(255,78,155,.18);border-radius:12px">
+            <strong style="color:#fff;font-size:14px">Reasoning models</strong>
+            <span style="display:block;font-size:13px;color:var(--muted)">o1, o3, Claude 3.5 Sonnet (extended thinking) — chain-of-thought baked in. Slower but stronger on complex multi-step problems.</span>
+          </div>
+          <div style="padding:10px 14px;background:rgba(255,78,155,.07);border:1px solid rgba(255,78,155,.18);border-radius:12px">
+            <strong style="color:#fff;font-size:14px">Multimodal models</strong>
+            <span style="display:block;font-size:13px;color:var(--muted)">GPT-4o, Gemini 2.5, Claude 3.5 — accept images, audio, video alongside text. One model for mixed inputs.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:22px"><strong>Choosing a model for Rudhra agents:</strong> Frontier API models (Claude/GPT-4) for complex reasoning and tool orchestration. Small open-weight models (Llama 3.2 8B) for classification steps, entity extraction, or offline/airgapped deployments.</div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════ LOCAL LLMs ══════════════════════════════════════ -->
+<section id="local-llms">
+  <div class="slide appear">
+    <div class="eyebrow">Local Inference</div>
+    <h2>Running LLMs on your own machine</h2>
+    <p>Open-weight models can be downloaded and run entirely locally — no API key, no internet, no data leaving your machine. The tradeoff is hardware cost and capability ceiling versus frontier cloud models.</p>
+
+    <div class="g2">
+      <div class="card">
+        <h3>Why run locally?</h3>
+        <div style="margin-top:12px;display:grid;gap:8px">
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><span style="color:var(--green);font-size:18px">✓</span> Complete data privacy — nothing leaves your machine</div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><span style="color:var(--green);font-size:18px">✓</span> Zero per-token cost after hardware</div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><span style="color:var(--green);font-size:18px">✓</span> Works offline / airgapped environments</div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><span style="color:var(--green);font-size:18px">✓</span> Fine-tune on your own codebase or domain data</div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><span style="color:var(--red);font-size:18px">✗</span> Smaller capability ceiling vs GPT-4 / Claude</div>
+          <div style="display:flex;gap:10px;align-items:center;font-size:14px;color:var(--muted)"><span style="color:var(--red);font-size:18px">✗</span> GPU VRAM is the hard constraint</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Hardware requirements</h3>
+        <div style="margin-top:12px;overflow-x:auto">
+          <table style="width:100%;border-collapse:collapse;font-size:13px">
+            <thead>
+              <tr>
+                <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted);font-weight:600">Model</th>
+                <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted);font-weight:600">VRAM (Q4)</th>
+                <th style="text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted);font-weight:600">Runs on</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:#fff">Llama 3.2 3B</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--green)">~2 GB</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted)">MacBook Air M1, most laptops</td></tr>
+              <tr><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:#fff">Llama 3.1 8B</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--cyan)">~5 GB</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted)">MacBook Pro M2, RTX 3060</td></tr>
+              <tr><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:#fff">Mistral 7B</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--cyan)">~5 GB</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted)">MacBook Pro M2, RTX 3060</td></tr>
+              <tr><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:#fff">Llama 3.1 70B</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--amber)">~40 GB</td><td style="padding:8px 10px;border-bottom:1px solid var(--line);color:var(--muted)">Mac Studio M2 Ultra, A100</td></tr>
+              <tr><td style="padding:8px 10px;color:#fff">Llama 3.1 405B</td><td style="padding:8px 10px;color:var(--red)">~230 GB</td><td style="padding:8px 10px;color:var(--muted)">Multi-GPU server only</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px;margin-bottom:16px">The local LLM stack</h3>
+    <div class="g3">
+      <div class="card" style="border-top:3px solid var(--cyan)">
+        <h3 style="color:var(--cyan)">Ollama</h3>
+        <p style="font-size:14px">The easiest way to run models locally. One command to pull and serve any open-weight model with an OpenAI-compatible REST API.</p>
+        <div class="codeblock" style="font-size:12px;margin-top:12px"><span class="cm"># Install &amp; run Llama 3.1</span>
+brew install ollama
+ollama pull llama3.1
+ollama run llama3.1
+
+<span class="cm"># OpenAI-compatible endpoint</span>
+curl localhost:11434/v1/chat/completions</div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--violet)">
+        <h3 style="color:var(--violet)">LM Studio</h3>
+        <p style="font-size:14px">GUI app for Mac, Windows, Linux. Download models from Hugging Face, chat in-app, and expose a local OpenAI-compatible server.</p>
+        <div style="margin-top:14px;display:grid;gap:8px">
+          <div style="padding:8px 12px;background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.2);border-radius:10px;font-size:13px;color:var(--muted)"><strong style="color:#fff">Best for:</strong> non-technical teammates, quick model comparisons, built-in chat UI</div>
+          <div style="padding:8px 12px;background:rgba(124,92,255,.08);border:1px solid rgba(124,92,255,.2);border-radius:10px;font-size:13px;color:var(--muted)"><strong style="color:#fff">Supports:</strong> GGUF quantised models, GPU offloading, Metal (Apple Silicon)</div>
+        </div>
+      </div>
+
+      <div class="card" style="border-top:3px solid var(--amber)">
+        <h3 style="color:var(--amber)">llama.cpp</h3>
+        <p style="font-size:14px">The engine underneath Ollama and LM Studio. C++ runtime, runs quantised GGUF models with CPU or GPU. Maximum control.</p>
+        <div class="codeblock" style="font-size:12px;margin-top:12px"><span class="cm"># Build &amp; run directly</span>
+git clone https://github.com/
+  ggerganov/llama.cpp
+make -j
+./llama-cli -m model.gguf \
+  -p <span class="str">"Explain attention"</span></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:28px;margin-bottom:16px">Calling a local model from your Java service</h3>
+    <div class="codeblock"><span class="cm">// Spring Boot — call local Ollama as if it were OpenAI</span>
+<span class="kw">@Service</span>
+<span class="kw">public class</span> <span class="fn">LocalLlmService</span> {
+
+    <span class="kw">private final</span> String OLLAMA_URL = <span class="str">"http://localhost:11434/v1/chat/completions"</span>;
+
+    <span class="kw">public</span> String <span class="fn">ask</span>(String prompt) {
+        <span class="kw">var</span> body = Map.of(
+            <span class="str">"model"</span>,    <span class="str">"llama3.1"</span>,
+            <span class="str">"messages"</span>, List.of(Map.of(<span class="str">"role"</span>, <span class="str">"user"</span>, <span class="str">"content"</span>, prompt))
+        );
+        <span class="cm">// RestTemplate / WebClient call to OLLAMA_URL</span>
+        <span class="kw">return</span> restTemplate.<span class="fn">postForObject</span>(OLLAMA_URL, body, String.class);
+    }
+}</div>
+
+    <div class="g2" style="margin-top:22px">
+      <div class="card">
+        <h3>Quantisation (Q4 / Q8)</h3>
+        <p style="font-size:14px">Weights are stored in 4-bit or 8-bit integers instead of 16/32-bit floats. A 7B model drops from ~14 GB → ~4 GB at Q4 with minimal quality loss. Most local models you'll download are GGUF-quantised.</p>
+      </div>
+      <div class="card">
+        <h3>When to use local vs API</h3>
+        <div style="margin-top:10px;display:grid;gap:6px;font-size:14px;color:var(--muted)">
+          <div><strong style="color:var(--cyan)">Local:</strong> privacy-sensitive code review, offline demos, experimentation, cost-sensitive classification tasks</div>
+          <div><strong style="color:var(--violet)">API:</strong> complex agent reasoning, production Rudhra runs, multimodal tasks, latest frontier capabilities</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="warn" style="margin-top:22px"><strong>Recommended starting point for this team:</strong> Install Ollama, pull <code>llama3.1:8b</code>, and point it at a small Spring Boot side project. The OpenAI-compatible endpoint means zero code changes from a cloud API integration.</div>
   </div>
 </section>
 
