@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Rudhra Test Intelligence Platform</title>
+<title>Rudhra Test Intelligence Platform — Insurance</title>
 <style>
   :root{
     --bg:#0b1220;
@@ -18,12 +18,13 @@
     --white:#ffffff;
   }
   *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
   body{
     margin:0;
     font-family:Inter,Segoe UI,Arial,sans-serif;
     background:#edf2f8;
     color:#1d2939;
-    line-height:1.5;
+    line-height:1.55;
   }
   .page{
     width:min(1120px, calc(100% - 32px));
@@ -34,10 +35,34 @@
     overflow:hidden;
   }
   header{
+    position:relative;
     background:linear-gradient(135deg,var(--bg),#13274c 55%,#173c66);
     color:var(--text);
     padding:64px 72px;
+    overflow:hidden;
   }
+  header::after{
+    content:"";
+    position:absolute;
+    right:-120px;
+    top:-120px;
+    width:360px;
+    height:360px;
+    background:radial-gradient(circle at center,rgba(88,166,255,.28),transparent 70%);
+    pointer-events:none;
+  }
+  .brandmark{
+    display:inline-flex;align-items:center;gap:12px;margin-bottom:22px;
+  }
+  .brandmark .glyph{
+    width:40px;height:40px;border-radius:11px;
+    background:linear-gradient(135deg,#58a6ff,#7ee787);
+    display:flex;align-items:center;justify-content:center;
+    font-weight:800;color:#0b1220;font-size:20px;
+    box-shadow:0 6px 18px rgba(88,166,255,.4);
+  }
+  .brandmark .brandtext{font-weight:700;letter-spacing:.02em;font-size:15px;color:#dbe8ff}
+  .brandmark .brandtext span{display:block;font-weight:400;font-size:12px;color:#9fc7ff}
   .eyebrow{
     text-transform:uppercase;
     letter-spacing:.14em;
@@ -49,6 +74,7 @@
     font-size:46px;
     line-height:1.08;
     margin:12px 0 18px;
+    position:relative;
   }
   .subtitle{
     max-width:820px;
@@ -59,8 +85,10 @@
     display:flex; gap:18px; flex-wrap:wrap; margin-top:28px;
     font-size:14px; color:#c5d2ea;
   }
+  .meta span{display:inline-flex;align-items:center;gap:8px}
+  .meta span::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--accent2)}
   main{padding:0 72px 72px}
-  section{padding:54px 0;border-bottom:1px solid #e5e7eb}
+  section{padding:54px 0;border-bottom:1px solid #e5e7eb;scroll-margin-top:20px}
   section:last-child{border-bottom:0}
   h2{font-size:30px;margin:0 0 16px;color:#10233f}
   h3{font-size:20px;margin:26px 0 10px;color:#173c66}
@@ -75,6 +103,11 @@
     background:#fbfdff;
   }
   .card h3{margin-top:0}
+  .card .tag{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;
+    text-transform:uppercase;color:#0b4f8a;background:#e0edff;
+    padding:3px 8px;border-radius:6px;margin-bottom:8px;
+  }
   .pill{
     display:inline-block;
     padding:6px 10px;
@@ -92,12 +125,26 @@
     border-radius:10px;
     margin:22px 0;
   }
+  .callout.good{border-left-color:var(--accent2);background:#ecfbf0}
   .kpi{
     font-size:34px;font-weight:800;color:#0b4f8a;
   }
   .small{font-size:13px;color:#667085}
   ul{padding-left:20px}
   li{margin:6px 0}
+  code{
+    font-family:"SF Mono",Consolas,Menlo,monospace;
+    font-size:12.5px;background:#eef2f8;color:#0b4f8a;
+    padding:1px 6px;border-radius:5px;
+  }
+  .toc{
+    background:#f5f9ff;border:1px solid #d9e2ef;border-radius:14px;
+    padding:22px 26px;margin:0;
+  }
+  .toc h2{font-size:18px;margin:0 0 14px;color:#173c66}
+  .toc ol{margin:0;padding-left:20px;columns:2;column-gap:32px}
+  .toc a{color:#184a7a;text-decoration:none;font-size:14px}
+  .toc a:hover{text-decoration:underline}
   .diagram{
     background:linear-gradient(180deg,#0d1627,#121e33);
     color:#eef4ff;
@@ -139,77 +186,124 @@
     padding:15px 18px;
   }
   .layer b{color:#8dc2ff}
+  .layer .sub{color:#c7d6ef;font-size:13.5px}
   table{
     width:100%; border-collapse:collapse; margin:18px 0;
     font-size:14px;
   }
   th,td{padding:12px 14px;border:1px solid #dbe3ef;vertical-align:top}
   th{background:#edf5ff;text-align:left;color:#173c66}
+  tbody tr:nth-child(even){background:#f8fbff}
   .timeline{
     display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:18px
   }
   .phase{padding:16px;border-radius:12px;background:#f7fbff;border:1px solid #d6e4f5}
   .phase b{color:#134f7d}
+  .phase .dur{display:block;font-size:12px;color:#7a8aa3;margin-top:6px}
+  .metric-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin:8px 0 4px}
+  .metric{background:#f5f9ff;border:1px solid #d9e2ef;border-radius:12px;padding:18px;text-align:center}
+  .metric .kpi{font-size:30px}
+  .metric .small{margin-top:4px}
+  .faq dt{font-weight:700;color:#173c66;margin-top:16px}
+  .faq dd{margin:6px 0 0;color:#344054}
   footer{
-    background:#0b1220;color:#b8c6dd;padding:28px 72px;font-size:13px
+    background:#0b1220;color:#b8c6dd;padding:34px 72px;font-size:13px
   }
+  footer .fbrand{color:#eaf0ff;font-weight:700;font-size:15px;margin-bottom:6px}
   @media(max-width:800px){
     header,main,footer{padding-left:24px;padding-right:24px}
     h1{font-size:34px}
-    .grid,.grid3,.timeline{grid-template-columns:1fr}
+    .grid,.grid3,.timeline,.metric-row{grid-template-columns:1fr}
+    .toc ol{columns:1}
   }
   @media print{
     body{background:#fff}
     .page{width:100%;margin:0;box-shadow:none;border-radius:0}
     section{page-break-inside:avoid}
+    header::after{display:none}
   }
 </style>
 </head>
 <body>
 <div class="page">
 <header>
+  <div class="brandmark">
+    <div class="glyph">R</div>
+    <div class="brandtext">Rudhra<span>Spec-first AI agent runtime</span></div>
+  </div>
   <div class="eyebrow">Rudhra Solution Whitepaper</div>
   <h1>Rudhra Test Intelligence Platform</h1>
-  <div class="subtitle">AI-powered engineering intelligence for Life Insurance and Property & Casualty testing.</div>
+  <div class="subtitle">AI-powered engineering intelligence for Life Insurance and Property &amp; Casualty testing — grounded in your requirements, product rules and code, governed by human approval, and explainable end to end.</div>
   <div class="meta">
-    <span>Audience: Practice Managers</span>
+    <span>Practice Managers</span>
     <span>Program Managers</span>
-    <span>QA Leaders</span>
+    <span>QA &amp; Test Leaders</span>
     <span>Enterprise Architects</span>
   </div>
 </header>
 
 <main>
+
 <section>
+  <nav class="toc">
+    <h2>Contents</h2>
+    <ol>
+      <li><a href="#exec">Executive Summary</a></li>
+      <li><a href="#problem">Business Problem</a></li>
+      <li><a href="#foundation">The Rudhra Platform Foundation</a></li>
+      <li><a href="#bizarch">Business Architecture</a></li>
+      <li><a href="#techarch">Technical Architecture</a></li>
+      <li><a href="#agents">Proposed Agent Portfolio</a></li>
+      <li><a href="#workflow">End-to-End Agentic Workflow</a></li>
+      <li><a href="#usecase">Example Use Case: Motor Endorsement</a></li>
+      <li><a href="#governance">Governance, Safety &amp; Explainability</a></li>
+      <li><a href="#toolgov">Tool Governance — the ATE Foundation</a></li>
+      <li><a href="#security">Security &amp; Regulatory Compliance</a></li>
+      <li><a href="#integrations">Integration Ecosystem</a></li>
+      <li><a href="#differentiators">Why Rudhra</a></li>
+      <li><a href="#benefits">Benefits &amp; Success Measures</a></li>
+      <li><a href="#roadmap">Delivery Roadmap</a></li>
+      <li><a href="#faq">Frequently Asked Questions</a></li>
+    </ol>
+  </nav>
+</section>
+
+<section id="exec">
   <h2>1. Executive Summary</h2>
   <p class="lead">Rudhra Test Intelligence Platform transforms insurance testing from a document-driven, manually coordinated activity into a connected, explainable and continuously improving engineering capability.</p>
-  <div class="callout"><b>Core proposition:</b> Rudhra does not simply generate test cases. It builds context from requirements, product rules, APIs, code, configuration, incidents and existing tests, then coordinates specialized agents to produce traceable test assets and automation.</div>
+  <div class="callout"><b>Core proposition:</b> Rudhra does not simply generate test cases. It builds context from requirements, product rules, APIs, code, configuration, incidents and existing tests, then coordinates specialized agents — under human governance — to produce traceable test assets and automation.</div>
+  <p>Rudhra is a <b>spec-first AI agent runtime</b>. Every agent is defined declaratively as a versioned specification, executed by a common <code>AgentRuntime</code>, and orchestrated into multi-step pipelines by <b>Rudhra Maestro</b>. Human-in-the-loop (HITL) approval gates, full trace capture through <b>TraceLens</b>, and a live event stream through the <b>AG-UI</b> contract are built into the platform — not bolted on. The result is an insurance quality capability that is fast <i>and</i> auditable.</p>
   <div class="grid3">
-    <div class="card"><div class="kpi">Faster</div><p>Accelerated requirement analysis and test design.</p></div>
-    <div class="card"><div class="kpi">Safer</div><p>Human-governed, traceable and policy-aware outputs.</p></div>
-    <div class="card"><div class="kpi">Smarter</div><p>Continuous learning from defects and production incidents.</p></div>
+    <div class="card"><div class="kpi">Faster</div><p>Accelerated requirement analysis, scenario design and automation — impact-based selection replaces full-suite regression.</p></div>
+    <div class="card"><div class="kpi">Safer</div><p>Human-governed, source-grounded and policy-aware outputs, with approval gates on every high-risk action.</p></div>
+    <div class="card"><div class="kpi">Smarter</div><p>Continuous learning from defects, escaped incidents and production behaviour, retained as reusable knowledge.</p></div>
   </div>
 </section>
 
-<section>
+<section id="problem">
   <h2>2. Business Problem</h2>
+  <p class="lead">Insurance is one of the most rule-dense, regulated and long-lived domains in software. Testing it well demands deep product knowledge that is expensive to acquire and easy to lose.</p>
   <div class="grid">
     <div class="card">
+      <span class="tag">Life</span>
       <h3>Life Insurance Complexity</h3>
       <ul>
         <li>Underwriting rules and medical evidence</li>
         <li>Riders, surrender, lapse, revival and maturity</li>
-        <li>Long-duration policy lifecycle</li>
-        <li>Benefit and premium calculations</li>
+        <li>Long-duration policy lifecycle spanning decades</li>
+        <li>Benefit, bonus and premium calculations</li>
+        <li>Nomination, assignment and death-claim handling</li>
       </ul>
     </div>
     <div class="card">
+      <span class="tag">P&amp;C</span>
       <h3>P&amp;C Complexity</h3>
       <ul>
-        <li>Rating factors and endorsements</li>
+        <li>Rating factors, tiers and endorsements</li>
         <li>Claims, deductibles, limits and exclusions</li>
         <li>Frequent product and regulatory changes</li>
         <li>High regression surface across channels and integrations</li>
+        <li>Subrogation, recovery and reinsurance effects</li>
       </ul>
     </div>
   </div>
@@ -221,11 +315,56 @@
     <span class="pill">Expensive regression cycles</span>
     <span class="pill">Repeated production defects</span>
     <span class="pill">Low traceability</span>
+    <span class="pill">Slow onboarding</span>
+    <span class="pill">Audit &amp; compliance overhead</span>
+  </div>
+  <div class="callout">
+    <b>The cost of the status quo:</b> business rules live in the heads of a few experts, impact analysis is a manual guessing exercise, regression runs full-suite "to be safe", and every escaped defect is a lesson no system remembers. Rudhra targets each of these directly.
   </div>
 </section>
 
-<section>
-  <h2>3. Business Architecture</h2>
+<section id="foundation">
+  <h2>3. The Rudhra Platform Foundation</h2>
+  <p class="lead">The Test Intelligence solution is built on the general-purpose Rudhra runtime — the same platform primitives, applied to the insurance testing domain.</p>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Spec-first</span>
+      <h3>Declarative agents</h3>
+      <p>Every agent is a versioned YAML specification with tools, connectors, approval policy and eval scenarios. Behaviour is reviewable, diff-able and governed — not buried in code.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Maestro</span>
+      <h3>Multi-agent orchestration</h3>
+      <p>Rudhra Maestro runs agents as sequential and parallel pipelines defined by an <code>OrchestrationSpec</code>, passing context between steps and pausing for approval where policy requires.</p>
+    </div>
+    <div class="card">
+      <span class="tag">HITL</span>
+      <h3>Approval engine</h3>
+      <p>Tools carry a <code>risk_level</code> and <code>approval_required</code> contract. The Approval Engine gates high-impact actions, holds durable checkpoints, and resumes only after a human decision.</p>
+    </div>
+    <div class="card">
+      <span class="tag">TraceLens</span>
+      <h3>Full observability</h3>
+      <p>Every run captures tool calls, model calls, token counts, latency and a timeline. TraceLens replays any run; OpenTelemetry spans export to your existing observability stack.</p>
+    </div>
+    <div class="card">
+      <span class="tag">AG-UI</span>
+      <h3>Live run experience</h3>
+      <p>A typed <code>RunEvent</code> stream drives Rudhra Studio's live run panel over SSE, and maps to the open AG-UI contract for interoperability with external tooling.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Evals</span>
+      <h3>Continuous evaluation</h3>
+      <p>Deterministic scenario packs and readiness scoring gate every agent before it ships, so quality of the <i>testing</i> capability is itself measured and enforced in CI.</p>
+    </div>
+  </div>
+  <div class="callout good">
+    <b>Enterprise-ready by construction:</b> workspace isolation, role-based access control (viewer / operator / admin), a per-workspace secret vault with rotation, and a unified audit log are core platform features — every insurance program runs in its own governed tenancy.
+  </div>
+</section>
+
+<section id="bizarch">
+  <h2>4. Business Architecture</h2>
   <div class="diagram">
     <div class="flow">
       <div class="node"><strong>Insurance Inputs</strong>Requirements, rules, rate tables, APIs, incidents</div>
@@ -238,50 +377,59 @@
     </div>
   </div>
   <table>
-    <tr><th>Stakeholder</th><th>Value</th></tr>
-    <tr><td>Practice Manager</td><td>Reusable insurance testing capability across programs and customers.</td></tr>
-    <tr><td>Program Manager</td><td>Improved predictability, faster analysis and reduced quality risk.</td></tr>
-    <tr><td>QA/Test Lead</td><td>Higher coverage, better traceability and less repetitive design work.</td></tr>
-    <tr><td>Architect</td><td>Connected view of requirements, services, APIs, data and tests.</td></tr>
+    <thead><tr><th>Stakeholder</th><th>What they get</th><th>Value</th></tr></thead>
+    <tbody>
+    <tr><td>Practice Manager</td><td>A reusable, spec-defined insurance testing capability</td><td>Repeatable delivery across programs and customers, less dependence on scarce experts.</td></tr>
+    <tr><td>Program Manager</td><td>Impact-based scoping and live run visibility</td><td>Improved predictability, faster analysis and reduced quality risk per release.</td></tr>
+    <tr><td>QA / Test Lead</td><td>Generated, traceable scenarios and automation</td><td>Higher coverage, better traceability and far less repetitive design work.</td></tr>
+    <tr><td>Enterprise Architect</td><td>A connected map of requirements, services and tests</td><td>Clear view of dependencies and change impact across the estate.</td></tr>
+    <tr><td>Compliance / Audit</td><td>Source-grounded, fully traced, approved outputs</td><td>Evidence-ready audit trail from requirement to result.</td></tr>
+    </tbody>
   </table>
 </section>
 
-<section>
-  <h2>4. Technical Architecture</h2>
+<section id="techarch">
+  <h2>5. Technical Architecture</h2>
+  <p class="lead">A layered runtime: experience at the top, orchestration and agents in the middle, knowledge and capabilities beneath, with governance and operations cutting across every layer.</p>
   <div class="diagram">
     <div class="stack">
-      <div class="layer"><b>Experience Layer</b><br>Rudhra Studio · Test Intelligence Dashboard · Review & Approval · Coverage Explorer</div>
-      <div class="layer"><b>Orchestration Layer</b><br>Rudhra Maestro · Multi-Agent Workflow · HITL · Retry · Policy Enforcement</div>
-      <div class="layer"><b>Agent Layer</b><br>Requirement · Product Rule · Life · P&amp;C · Architecture · Scenario · Data · Coverage · Automation · Change Impact</div>
-      <div class="layer"><b>Knowledge Layer</b><br>RAG · Insurance Knowledge Graph · Memory · Jira · Confluence · Source Code · Product Configuration · Incidents</div>
-      <div class="layer"><b>Capability Layer</b><br>OpenAPI · Git · Databases · Test Frameworks · Document Parsers · Model Gateway</div>
-      <div class="layer"><b>Governance & Operations</b><br>TraceLens · AG-UI Events · Audit · RBAC · Sandbox · Observability · Cost Controls</div>
+      <div class="layer"><b>Experience Layer</b><br><span class="sub">Rudhra Studio · Test Intelligence Dashboard · Live Run Panel · Review &amp; Approval · Coverage Explorer · TraceLens replay</span></div>
+      <div class="layer"><b>Orchestration Layer — Maestro</b><br><span class="sub">Multi-agent workflow · sequential &amp; parallel fan-out · input mapping · HITL approval gates · retry &amp; timeout · policy enforcement</span></div>
+      <div class="layer"><b>Agent Layer</b><br><span class="sub">Requirement · Product Rule · Life · P&amp;C · Architecture · Rule Mining · Scenario · Test Data · Expected Result · Coverage · Automation · Change Impact · Production Learning · Documentation</span></div>
+      <div class="layer"><b>Knowledge Layer</b><br><span class="sub">RAG · Insurance Knowledge Graph · run memory · Jira · Confluence · source code · product configuration · incident history</span></div>
+      <div class="layer"><b>Capability Layer</b><br><span class="sub">Connector Registry · OpenAPI · Git · databases · test frameworks · document parsers · model gateway</span></div>
+      <div class="layer"><b>Governance &amp; Operations</b><br><span class="sub">TraceLens · AG-UI event stream · unified audit log · RBAC &amp; workspaces · secret vault · sandbox · OTel observability · cost controls</span></div>
     </div>
   </div>
-</section>
-
-<section>
-  <h2>5. Proposed Agent Portfolio</h2>
-  <div class="grid">
-    <div class="card"><h3>Requirement Analysis Agent</h3><p>Extracts actors, business rules, acceptance criteria, dependencies and ambiguity.</p></div>
-    <div class="card"><h3>Product Rule Agent</h3><p>Interprets product configuration, decision tables, rate tables and policy wording.</p></div>
-    <div class="card"><h3>Life Insurance Domain Agent</h3><p>Understands underwriting, riders, policy values, lapse, revival, maturity and death claims.</p></div>
-    <div class="card"><h3>P&amp;C Domain Agent</h3><p>Understands rating, endorsements, coverage, claims, deductibles, settlement and recovery.</p></div>
-    <div class="card"><h3>Architecture Discovery Agent</h3><p>Maps services, APIs, databases, events and downstream dependencies.</p></div>
-    <div class="card"><h3>Rule Mining Agent</h3><p>Finds hidden rules in code, defects, incidents and technical workarounds.</p></div>
-    <div class="card"><h3>Scenario Generator Agent</h3><p>Generates happy, negative, boundary, state-transition and decision-table scenarios.</p></div>
-    <div class="card"><h3>Test Data Generator Agent</h3><p>Creates synthetic customers, policies, claims, assets, beneficiaries and payment data.</p></div>
-    <div class="card"><h3>Expected Result Agent</h3><p>Calculates expected premiums, benefits, statuses, documents and downstream effects.</p></div>
-    <div class="card"><h3>Coverage Agent</h3><p>Maps requirements and rules to existing and generated tests, highlighting gaps.</p></div>
-    <div class="card"><h3>Automation Generator Agent</h3><p>Generates API, UI and contract test automation for approved scenarios.</p></div>
-    <div class="card"><h3>Change Impact Agent</h3><p>Determines affected capabilities and selects the right regression set.</p></div>
-    <div class="card"><h3>Production Learning Agent</h3><p>Converts incidents and escaped defects into regression knowledge.</p></div>
-    <div class="card"><h3>Documentation Agent</h3><p>Keeps rules, tests, architecture and operating documentation synchronized.</p></div>
+  <div class="callout">
+    <b>Runtime contract:</b> a single <code>AgentRuntime</code> dispatches every agent through a shared <code>RunContext</code>, which exposes tools and connectors, records a <code>RunRecord</code>, and returns a typed <code>RunResult</code> — optionally carrying an approval request. Agents never touch infrastructure directly; all external access flows through the <code>ConnectorRegistry</code> boundary. This uniformity is what makes the platform explainable and safe at scale.
   </div>
 </section>
 
-<section>
-  <h2>6. End-to-End Agentic Workflow</h2>
+<section id="agents">
+  <h2>6. Proposed Agent Portfolio</h2>
+  <p class="lead">Fourteen specialized, spec-defined agents — each with a narrow responsibility, its own tools and evals, and an approval policy appropriate to its risk.</p>
+  <div class="grid">
+    <div class="card"><h3>Requirement Analysis Agent</h3><p>Extracts actors, business rules, acceptance criteria, dependencies and ambiguity from stories and specifications.</p></div>
+    <div class="card"><h3>Product Rule Agent</h3><p>Interprets product configuration, decision tables, rate tables and policy wording into structured, testable constraints.</p></div>
+    <div class="card"><h3>Life Insurance Domain Agent</h3><p>Understands underwriting, riders, policy values, lapse, revival, maturity and death claims.</p></div>
+    <div class="card"><h3>P&amp;C Domain Agent</h3><p>Understands rating, endorsements, coverage, claims, deductibles, settlement and recovery.</p></div>
+    <div class="card"><h3>Architecture Discovery Agent</h3><p>Maps services, APIs, databases, events and downstream dependencies from code and OpenAPI.</p></div>
+    <div class="card"><h3>Rule Mining Agent</h3><p>Finds hidden rules in code, defects, incidents and technical workarounds that never made it into a document.</p></div>
+    <div class="card"><h3>Scenario Generator Agent</h3><p>Generates happy-path, negative, boundary, state-transition and decision-table scenarios.</p></div>
+    <div class="card"><h3>Test Data Generator Agent</h3><p>Creates synthetic customers, policies, claims, assets, beneficiaries and payment data — no real PII.</p></div>
+    <div class="card"><h3>Expected Result Agent</h3><p>Calculates expected premiums, benefits, statuses, documents and downstream effects from source rules.</p></div>
+    <div class="card"><h3>Coverage Agent</h3><p>Maps requirements and rules to existing and generated tests, highlighting gaps and redundancy.</p></div>
+    <div class="card"><h3>Automation Generator Agent</h3><p>Generates API, UI and contract test automation for approved scenarios only.</p></div>
+    <div class="card"><h3>Change Impact Agent</h3><p>Determines affected capabilities and selects the right regression set for a given change.</p></div>
+    <div class="card"><h3>Production Learning Agent</h3><p>Converts incidents and escaped defects into durable regression knowledge and new scenarios.</p></div>
+    <div class="card"><h3>Documentation Agent</h3><p>Keeps rules, tests, architecture and operating documentation synchronized as things change.</p></div>
+  </div>
+  <p class="small">Each agent is registered against a workspace, versioned, and scored for readiness before it participates in a pipeline. New domain agents can be scaffolded from templates without changing platform code.</p>
+</section>
+
+<section id="workflow">
+  <h2>7. End-to-End Agentic Workflow</h2>
   <div class="diagram">
     <div class="flow">
       <div class="node">Requirement Intake</div><div class="arrow">→</div>
@@ -293,71 +441,238 @@
       <div class="node">Expected Results</div><div class="arrow">→</div>
       <div class="node">Coverage Review</div><div class="arrow">→</div>
       <div class="node">Automation</div><div class="arrow">→</div>
-      <div class="node">Execution & Learning</div>
+      <div class="node">Execution &amp; Learning</div>
     </div>
   </div>
-  <p>Rudhra Maestro coordinates the agents, applies policies, pauses for human approval when required, and emits full trace events through TraceLens and AG-UI.</p>
+  <p>Rudhra Maestro coordinates the agents through a declarative <code>OrchestrationSpec</code>, mapping each step's output into the next step's input. It applies policies, runs independent steps in parallel, pauses for human approval at defined gates, and emits a full trace through TraceLens and the AG-UI event stream so the run is visible live and replayable afterwards.</p>
+  <div class="callout good">
+    <b>Human control points:</b> approval gates typically sit after <i>Rule Extraction</i> (confirm interpreted business rules), before <i>Automation</i> (approve scenarios to be automated), and before any write-back to Jira or a test-management system. Nothing high-impact happens without a recorded human decision.
+  </div>
 </section>
 
-<section>
-  <h2>7. Example Use Case: Motor Endorsement</h2>
+<section id="usecase">
+  <h2>8. Example Use Case: Motor Endorsement</h2>
   <div class="callout"><b>Scenario:</b> Add an additional driver to an active motor policy.</div>
   <table>
-    <tr><th>Step</th><th>Rudhra Action</th><th>Output</th></tr>
-    <tr><td>1</td><td>Read Jira story and acceptance criteria</td><td>Structured requirements and open questions</td></tr>
-    <tr><td>2</td><td>Load age, claims and rating rules</td><td>Decision table and constraints</td></tr>
-    <tr><td>3</td><td>Inspect impacted APIs and services</td><td>Change-impact map</td></tr>
-    <tr><td>4</td><td>Generate scenarios</td><td>Positive, negative, boundary and state tests</td></tr>
-    <tr><td>5</td><td>Create synthetic policies and drivers</td><td>Reusable test data</td></tr>
-    <tr><td>6</td><td>Calculate expected premium and status</td><td>Verifiable expected results</td></tr>
-    <tr><td>7</td><td>Generate approved automation</td><td>API/UI automation assets</td></tr>
+    <thead><tr><th>Step</th><th>Rudhra Action</th><th>Agent</th><th>Output</th></tr></thead>
+    <tbody>
+    <tr><td>1</td><td>Read Jira story and acceptance criteria</td><td>Requirement Analysis</td><td>Structured requirements and open questions</td></tr>
+    <tr><td>2</td><td>Load age, claims-history and rating rules</td><td>Product Rule</td><td>Decision table and constraints</td></tr>
+    <tr><td>3</td><td>Validate against motor domain rules</td><td>P&amp;C Domain</td><td>Confirmed rules, flagged edge cases</td></tr>
+    <tr><td>4</td><td>Inspect impacted APIs and services</td><td>Change Impact</td><td>Change-impact map &amp; regression set</td></tr>
+    <tr><td>5</td><td>Generate scenarios</td><td>Scenario Generator</td><td>Positive, negative, boundary and state tests</td></tr>
+    <tr><td>6</td><td>Create synthetic policies and drivers</td><td>Test Data Generator</td><td>Reusable, PII-free test data</td></tr>
+    <tr><td>7</td><td>Calculate expected premium and status</td><td>Expected Result</td><td>Verifiable, source-linked expected results</td></tr>
+    <tr><td>8</td><td>Generate approved automation</td><td>Automation Generator</td><td>API / UI automation assets</td></tr>
+    </tbody>
+  </table>
+  <p class="small">Between steps 5 and 8 a human reviews and approves the scenario set in Rudhra Studio; the Automation Generator only acts on approved scenarios. Every output links back to the rule or contract that justifies it.</p>
+</section>
+
+<section id="governance">
+  <h2>9. Governance, Safety and Explainability</h2>
+  <div class="grid">
+    <div class="card"><h3>Source-grounded outputs</h3><p>Every expected result must reference a business rule, configuration item, API contract or approved source. No ungrounded assertions reach a test.</p></div>
+    <div class="card"><h3>Human approval</h3><p>High-impact rules, automation changes and production-sensitive actions require review through the Approval Engine's durable HITL gates.</p></div>
+    <div class="card"><h3>Synthetic data</h3><p>Generated test data avoids real customer PII and supports repeatable, compliant test execution.</p></div>
+    <div class="card"><h3>Traceability</h3><p>A complete chain: Requirement → Rule → Test → Automation → Result → Incident, replayable in TraceLens.</p></div>
+    <div class="card"><h3>Full audit trail</h3><p>Every run, tool call, model call and approval decision is captured in a unified, exportable audit log.</p></div>
+    <div class="card"><h3>Policy enforcement</h3><p>Workspace policies, role-based access and cost controls constrain what agents may do — enforced by the runtime, not by convention.</p></div>
+  </div>
+</section>
+
+<section id="toolgov">
+  <h2>10. Tool Governance — the Agentic Tool Engineering (ATE) Foundation</h2>
+  <p class="lead">In insurance, <i>what</i> an agent is allowed to do matters as much as what it produces. Rudhra's Agentic Tool Engineering (ATE) layer turns every agent action into a governed, versioned, traced tool call — never arbitrary code.</p>
+  <div class="callout"><b>Principle:</b> every side effect an agent can have — reading a rate table, drafting a scenario, writing back to Jira — is a registered <i>tool</i> with a contract. Tools execute through a single governed pipeline, so policy, approval, redaction and tracing apply uniformly and cannot be bypassed.</div>
+  <div class="grid">
+    <div class="card">
+      <span class="tag">Contract</span>
+      <h3>Versioned tool contracts</h3>
+      <p>Each tool is a JSON-Schema contract — <code>tool_id</code>, semver <code>version</code>, typed input/output schemas, declared capabilities, and policy blocks for approval, permissions, timeout, retry, rate limit and observability. Contracts are immutable once registered.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Lifecycle</span>
+      <h3>Governed lifecycle &amp; registry</h3>
+      <p>Tools move through <code>draft → active → deprecated → retired</code> in a workspace-scoped registry. A tool only becomes <code>active</code> once its contract tests pass in CI, and semver rules guard compatibility.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Runtime</span>
+      <h3>One governed execution path</h3>
+      <p>Every call flows through a single <code>ToolRuntime.invoke()</code> pipeline: resolve definition → policy checks → input validation → approval gate → handler (with degradation fallback) → normalized result envelope → sanitized trace → metrics.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Preview</span>
+      <h3>Dry-run before side effects</h3>
+      <p>Tools support a <code>dry_run</code> mode that previews the effect of an action — for example, what a rating change would do — without committing any external write.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Redaction</span>
+      <h3>Trace sanitization</h3>
+      <p>Before any execution trace is stored, a three-pass redactor strips secrets and sensitive fields (key-name heuristics, per-tool named fields, per-tool value patterns) — so traces are safe to keep and inspect in a regulated environment.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Observability</span>
+      <h3>Per-tool metrics &amp; tests</h3>
+      <p>Latency, call-count and retry metrics are emitted per tool via OpenTelemetry, and a contract-test harness gates every tool — so the reliability of the tooling itself is measured, not assumed.</p>
+    </div>
+  </div>
+  <h3>Two classes of tool, two levels of trust</h3>
+  <table>
+    <thead><tr><th>Tool class</th><th>Behaviour</th><th>Examples in the insurance solution</th></tr></thead>
+    <tbody>
+    <tr><td><b>Draft-write</b></td><td>Produce internal artifacts only — no external publish; safe to run without an approval gate</td><td>Draft scenarios, draft test data, draft expected-result artifacts</td></tr>
+    <tr><td><b>Approval-gated external-write</b></td><td>Require a recorded human decision before any external system is touched</td><td>Writing scenarios back to a test-management system or Jira, publishing coverage reports</td></tr>
+    </tbody>
+  </table>
+  <div class="callout good">
+    <b>Proven on the platform:</b> this exact governed-tooling pattern already powers Rudhra's own <b>Release Intelligence Agent (RRIA)</b> and helper agents — Maestro-orchestrated agents that read Jira, produce <i>draft</i> artifacts (roadmap-drift report, gap analysis, portfolio snapshot, story-draft pack, release plan), and write back only after human approval. The insurance Test Intelligence agents are built on the same foundation, so the draft-first, approval-gated model is real and in production use, not aspirational. A <b>declarative generative UI</b> layer lets each agent declare how its output should be rendered, giving reviewers rich, context-aware approval panels instead of generic prompts.
+  </div>
+</section>
+
+<section id="security">
+  <h2>11. Security &amp; Regulatory Compliance</h2>
+  <p class="lead">Insurance testing touches sensitive data and regulated processes. Rudhra is designed so the intelligence never comes at the expense of control.</p>
+  <div class="grid">
+    <div class="card">
+      <h3>Data protection</h3>
+      <ul>
+        <li>Synthetic-only test data — no real policyholder PII generated or stored</li>
+        <li>Per-workspace secret vault with staged / active / retired rotation</li>
+        <li>Model gateway abstracts providers; no data pinned to a single vendor</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Access &amp; isolation</h3>
+      <ul>
+        <li>Role-based access control — viewer, operator and admin scopes</li>
+        <li>Per-workspace tenancy and isolation for each program or customer</li>
+        <li>JWT-based authentication with refresh and revocation</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Auditability</h3>
+      <ul>
+        <li>Unified audit log, filterable and exportable as NDJSON</li>
+        <li>Full run replay via TraceLens for any historical run</li>
+        <li>OpenTelemetry spans exportable to enterprise observability</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Regulatory alignment</h3>
+      <ul>
+        <li>Evidence-ready traceability supports internal &amp; external audit</li>
+        <li>Human sign-off recorded on every high-risk action</li>
+        <li>Deterministic evals demonstrate testing-capability integrity</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="integrations">
+  <h2>12. Integration Ecosystem</h2>
+  <p class="lead">Rudhra meets your estate where it is. Connectors are registered adapters behind a common boundary, so new sources are additive.</p>
+  <table>
+    <thead><tr><th>Category</th><th>Integrations</th><th>Used for</th></tr></thead>
+    <tbody>
+    <tr><td>Requirements &amp; docs</td><td>Jira, Confluence</td><td>Story intake, acceptance criteria, rule documentation, write-back</td></tr>
+    <tr><td>Code &amp; contracts</td><td>Git, OpenAPI / Swagger</td><td>Architecture discovery, rule mining, change-impact analysis</td></tr>
+    <tr><td>Data</td><td>Relational databases, product configuration stores</td><td>Rate tables, decision tables, reference data</td></tr>
+    <tr><td>Test frameworks</td><td>API, UI and contract automation frameworks</td><td>Generating and running approved automation</td></tr>
+    <tr><td>AI models</td><td>Model gateway (multi-provider)</td><td>Reasoning across all agents, vendor-neutral</td></tr>
+    <tr><td>Observability</td><td>OpenTelemetry-compatible backends</td><td>Metrics, spans, cost and latency monitoring</td></tr>
+    </tbody>
   </table>
 </section>
 
-<section>
-  <h2>8. Governance, Safety and Explainability</h2>
+<section id="differentiators">
+  <h2>13. Why Rudhra</h2>
   <div class="grid">
-    <div class="card"><h3>Source-grounded outputs</h3><p>Every expected result must reference a business rule, configuration item, API contract or approved source.</p></div>
-    <div class="card"><h3>Human approval</h3><p>High-impact rules, automation changes and production-sensitive actions require review.</p></div>
-    <div class="card"><h3>Synthetic data</h3><p>Generated test data avoids real customer PII and supports repeatable test execution.</p></div>
-    <div class="card"><h3>Traceability</h3><p>Requirement → Rule → Test → Automation → Result → Incident.</p></div>
+    <div class="card">
+      <span class="tag">Not a generator</span>
+      <h3>Engineering intelligence, not a prompt</h3>
+      <p>Rudhra reasons over your actual requirements, rules, code and incidents — it is not a stateless test-case generator producing plausible-looking text.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Governed</span>
+      <h3>Human-in-the-loop by design</h3>
+      <p>Approval gates, risk-rated tools and durable checkpoints are platform primitives, so autonomy is always bounded by human control.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Explainable</span>
+      <h3>Every output is traceable</h3>
+      <p>Source grounding plus TraceLens replay means any test asset can be justified back to the rule that produced it — essential in a regulated domain.</p>
+    </div>
+    <div class="card">
+      <span class="tag">Extensible</span>
+      <h3>Spec-first &amp; workspace-scoped</h3>
+      <p>New domains, agents and connectors are declared, not hard-coded — the capability grows without re-architecting the platform.</p>
+    </div>
   </div>
 </section>
 
-<section>
-  <h2>9. Business Benefits and Success Measures</h2>
+<section id="benefits">
+  <h2>14. Business Benefits and Success Measures</h2>
+  <div class="metric-row">
+    <div class="metric"><div class="kpi">↓ effort</div><div class="small">Manual requirement interpretation</div></div>
+    <div class="metric"><div class="kpi">↑ coverage</div><div class="small">Rules linked to tests</div></div>
+    <div class="metric"><div class="kpi">↓ cost</div><div class="small">Impact-based regression</div></div>
+    <div class="metric"><div class="kpi">↓ escapes</div><div class="small">Defects mapped to gaps</div></div>
+  </div>
   <table>
-    <tr><th>Outcome</th><th>Illustrative Measure</th></tr>
-    <tr><td>Faster analysis</td><td>Reduction in manual requirement interpretation effort</td></tr>
-    <tr><td>Improved coverage</td><td>Percentage of business rules linked to tests</td></tr>
+    <thead><tr><th>Outcome</th><th>Illustrative Measure</th></tr></thead>
+    <tbody>
+    <tr><td>Faster analysis</td><td>Reduction in manual requirement-interpretation effort per story</td></tr>
+    <tr><td>Improved coverage</td><td>Percentage of business rules linked to at least one test</td></tr>
     <tr><td>Lower regression cost</td><td>Impact-based test selection instead of full-suite execution</td></tr>
     <tr><td>Reduced escaped defects</td><td>Production defects mapped back to missing coverage</td></tr>
     <tr><td>Knowledge retention</td><td>Critical rules and rationale retained beyond individual teams</td></tr>
     <tr><td>Automation acceleration</td><td>Approved scenarios converted into executable assets faster</td></tr>
+    <tr><td>Audit readiness</td><td>Share of test assets with complete requirement-to-result traceability</td></tr>
+    </tbody>
   </table>
+  <p class="small">Measures are illustrative and are baselined per program during the pilot, then tracked release over release.</p>
 </section>
 
-<section>
-  <h2>10. Delivery Roadmap</h2>
+<section id="roadmap">
+  <h2>15. Delivery Roadmap</h2>
   <div class="timeline">
-    <div class="phase"><b>Phase 1</b><br>Requirement & Rule Intelligence</div>
-    <div class="phase"><b>Phase 2</b><br>Scenario & Test Data Generation</div>
-    <div class="phase"><b>Phase 3</b><br>Coverage & Automation</div>
-    <div class="phase"><b>Phase 4</b><br>Change Impact & Regression Intelligence</div>
-    <div class="phase"><b>Phase 5</b><br>Production Learning & Continuous Improvement</div>
+    <div class="phase"><b>Phase 1</b><br>Requirement &amp; Rule Intelligence<span class="dur">Foundations</span></div>
+    <div class="phase"><b>Phase 2</b><br>Scenario &amp; Test Data Generation<span class="dur">Core value</span></div>
+    <div class="phase"><b>Phase 3</b><br>Coverage &amp; Automation<span class="dur">Execution</span></div>
+    <div class="phase"><b>Phase 4</b><br>Change Impact &amp; Regression Intelligence<span class="dur">Efficiency</span></div>
+    <div class="phase"><b>Phase 5</b><br>Production Learning &amp; Continuous Improvement<span class="dur">Compounding</span></div>
   </div>
   <h3>Recommended pilot</h3>
-  <p>Start with one Life journey and one P&amp;C journey:</p>
+  <p>Start narrow and prove end-to-end value on one journey per line of business:</p>
   <ul>
     <li><b>Life:</b> Term-life proposal → underwriting → premium → issuance</li>
     <li><b>P&amp;C:</b> Motor quote → rating → underwriting → issuance → claim registration</li>
   </ul>
-  <div class="callout"><b>Positioning:</b> Rudhra Test Intelligence is not an AI test-case generator. It is an engineering intelligence platform for insurance quality.</div>
+  <div class="callout"><b>Positioning:</b> Rudhra Test Intelligence is not an AI test-case generator. It is an engineering intelligence platform for insurance quality — grounded, governed, and explainable end to end.</div>
 </section>
+
+<section id="faq">
+  <h2>16. Frequently Asked Questions</h2>
+  <dl class="faq">
+    <dt>Does Rudhra replace our QA engineers?</dt>
+    <dd>No. It removes repetitive analysis and design work and surfaces impact and gaps, so engineers spend their time on judgement, review and approval. Humans stay in control at every high-risk gate.</dd>
+    <dt>How do we trust the generated outputs?</dt>
+    <dd>Every expected result is grounded in a business rule, configuration item or API contract, and every run is fully traced and replayable in TraceLens. Nothing high-impact ships without a recorded human approval.</dd>
+    <dt>Will our sensitive customer data be exposed to a model?</dt>
+    <dd>Test data is synthetic and PII-free by design. Secrets live in a per-workspace vault, and the model gateway keeps the platform vendor-neutral.</dd>
+    <dt>How does it fit our existing tools?</dt>
+    <dd>Through registered connectors — Jira, Confluence, Git, OpenAPI, databases and test frameworks — behind a common boundary. New sources are additive and do not require platform changes.</dd>
+    <dt>How quickly can we see value?</dt>
+    <dd>A focused pilot on one Life and one P&amp;C journey demonstrates the full requirement-to-automation flow, with baselined success measures tracked from the first release.</dd>
+  </dl>
+</section>
+
 </main>
 
 <footer>
-  Rudhra Test Intelligence Platform · Concept Proposal · Prepared for Practice and Program Leadership
+  <div class="fbrand">Rudhra Test Intelligence Platform</div>
+  Concept Proposal · Prepared for Practice and Program Leadership · Built on the Rudhra spec-first AI agent runtime.
 </footer>
 </div>
 </body>
